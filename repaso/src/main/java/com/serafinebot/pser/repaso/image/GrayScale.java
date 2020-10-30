@@ -28,9 +28,9 @@ public class GrayScale {
             for (int i = 0; i < imgData.length - 3; i += 3) {
                 int sum = 0;
                 for (int j = 0; j < 3; j++) sum += imgData[i + j] & 0xff;
-                for (int j = 0; j < 3; j++) imgData[i + j] = (byte)(sum / 3);
+                for (int j = 0; j < 3; j++) imgData[i + j] = (byte) (sum / 3);
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             System.out.println(e.getMessage());
             return;
         }
