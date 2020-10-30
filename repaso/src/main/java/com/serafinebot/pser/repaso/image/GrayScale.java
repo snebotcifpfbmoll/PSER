@@ -21,7 +21,10 @@ public class GrayScale {
         BufferedImage orgImage = null;
         BufferedImage grayImage = null;
         try {
-            orgImage = ImageIO.read(new File(FileUtils.getInstance().resourceDirectory() + String.format("image-%dx%d.jpg", IMAGE_WIDTH, IMAGE_HEIGHT)));
+            FileUtils fileUtils = FileUtils.getInstance();
+            String imageName = String.format("image-%dx%d-3.jpg", IMAGE_WIDTH, IMAGE_HEIGHT);
+            File imageFile = fileUtils.resourceFile(imageName);
+            orgImage = ImageIO.read(imageFile);
             grayImage = ImageUtils.copy(orgImage);
             byte[] imgData = ((DataBufferByte) grayImage.getRaster().getDataBuffer()).getData();
 

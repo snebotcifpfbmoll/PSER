@@ -1,5 +1,7 @@
 package com.serafinebot.pser.repaso.util;
 
+import java.io.File;
+
 public class FileUtils {
     private static FileUtils instance = null;
 
@@ -15,5 +17,19 @@ public class FileUtils {
 
     public String resourceDirectory() {
         return projectSource;
+    }
+
+    public File file(String path) {
+        File file = null;
+        try {
+           file = new File(path);
+        } catch (Exception e) {
+            System.out.printf("%s: %s", path, e.getMessage());
+        }
+        return file;
+    }
+
+    public File resourceFile(String fileName) {
+        return file(String.format("%s%s", projectSource, fileName));
     }
 }
