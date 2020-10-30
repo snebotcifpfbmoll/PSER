@@ -44,7 +44,7 @@ public class Convolution {
         }
 
         // display all of the images that we've processed
-        JFrame frame = new JFrame("Image");
+        JFrame frame = new JFrame("Convolution");
         frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
