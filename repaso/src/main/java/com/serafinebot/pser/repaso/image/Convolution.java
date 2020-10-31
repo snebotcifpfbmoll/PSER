@@ -39,7 +39,7 @@ public class Convolution {
                 imageArray.add(image);
             }
         } catch (Exception e) {
-            System.out.printf("filed to in main: %s", e.getMessage());
+            System.out.printf("filed in main: %s", e.getMessage());
             return;
         }
 
@@ -47,6 +47,7 @@ public class Convolution {
         JFrame frame = new JFrame("Convolution");
         frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));

@@ -1,5 +1,6 @@
 package com.serafinebot.pser.repaso.util;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
@@ -13,53 +14,59 @@ public class ImageUtils {
         return new BufferedImage(cm, raster, alpha, null);
     }
 
-    public static byte[] convolution(byte[] src, int width, int height, int pro, byte[][] conv) {
-        byte[] ret = new byte[src.length];
-
+    public static int calculateK(byte[][] conv) {
         int K = 0;
         for (int i = 0; i < conv.length; i++) {
             for (int j = 0; j < conv[i].length; j++) {
                 K += conv[i][j];
             }
         }
+        return K == 0 ? 1 : K;
+    }
 
-        if (K == 0) K = 1;
+    public static byte[] convolution(byte[] src, int width, int height, int pro, int startX, int startY, int endX, int endY, byte[][] conv) {
+        if (conv.length != conv[0].length) return null;
 
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                for (int k = 0; k < pro; k++) {
-                    if (i == 0 || i == height - 1 || j == 0 || j == width - 1) {
-                        int index = (i * width * pro) + (j * pro) + k;
-                        ret[index] = src[index];
-                        continue;
-                    }
+        byte[] ret = src.clone();
+        int K = calculateK(conv);
 
-                    int sum = 0;
-                    int conv_diff = conv.length / 2;
-                    int index = ((i - conv_diff) * width * pro) + ((j - conv_diff) * pro) + k;
-                    for (int l = 0; l < conv.length; l++) {
-                        for (int m = 0; m < conv[l].length; m++) {
-                            sum += Byte.toUnsignedInt(src[index]) * conv[l][m];
+        int conv_diff = conv.length / 2;
+        if (startX < conv_diff) startX = conv_diff;
+        if (startY < conv_diff) startY = conv_diff;
+        if (endX > width - conv_diff) endX = width - conv_diff;
+        if (endY > height - conv_diff) endX = height - conv_diff;
+
+        for (int y = startY; y < endY; y++) {
+            for (int x = startX; x < endX; x++) {
+                for (int z = 0; z < pro; z++) {
+                    Integer sum = 0;
+                    int index = ((y - conv_diff) * width * pro) + ((x - conv_diff) * pro) + z;
+                    for (int i = 0; i < conv.length; i++) {
+                        for (int j = 0; j < conv[i].length; j++) {
+                            sum += Byte.toUnsignedInt(src[index]) * conv[i][j];
                             index += pro;
                         }
-
-                        index += (width - conv[l].length) * pro;
+                        index += (width - conv[i].length) * pro;
                     }
 
-                    index = (i * width * pro) + (j * pro) + k;
-                    Integer value = sum / K;
-                    if (value > 255) {
-                        value = 255;
-                    } else if (value < 0) {
-                        value = 0;
+                    index = (y * width * pro) + (x * pro) + z;
+                    sum /= K;
+                    if (sum > 255) {
+                        sum = 255;
+                    } else if (sum < 0) {
+                        sum = 0;
                     }
 
-                    ret[index] = value.byteValue();
+                    ret[index] = sum.byteValue();
                 }
             }
         }
 
         return ret;
+    }
+
+    public static byte[] convolution(byte[] src, int width, int height, int pro, byte[][] conv) {
+        return convolution(src, width, height, pro, 0, 0, width, height, conv);
     }
 
     public static BufferedImage convolution(BufferedImage src, byte[][] conv) {
@@ -68,5 +75,9 @@ public class ImageUtils {
         byte[] res = ImageUtils.convolution(imageData, image.getWidth(), image.getHeight(), 3, conv); // process image with convolution filter
         System.arraycopy(res, 0, imageData, 0, res.length); // copy results to the source byte array
         return image;
+    }
+
+    public static byte[] getByteArray(BufferedImage image) {
+        return ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
     }
 }
