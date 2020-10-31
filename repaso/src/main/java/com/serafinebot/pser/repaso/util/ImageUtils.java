@@ -34,7 +34,7 @@ public class ImageUtils {
         if (startX < conv_diff) startX = conv_diff;
         if (startY < conv_diff) startY = conv_diff;
         if (endX > width - conv_diff) endX = width - conv_diff;
-        if (endY > height - conv_diff) endX = height - conv_diff;
+        if (endY > height - conv_diff) endY = height - conv_diff;
 
         for (int y = startY; y < endY; y++) {
             for (int x = startX; x < endX; x++) {

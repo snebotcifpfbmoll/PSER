@@ -30,7 +30,7 @@ public class FireAnimation extends JComponent implements ActionListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        Image fire = FireTest.createFireImage(IMAGE_WIDTH, IMAGE_HEIGHT).getScaledInstance(WINDOW_WIDTH, WINDOW_HEIGHT, Image.SCALE_DEFAULT);
+        Image fire = Fire.createFireImage(IMAGE_WIDTH, IMAGE_HEIGHT).getScaledInstance(WINDOW_WIDTH, WINDOW_HEIGHT, Image.SCALE_DEFAULT);
         g.drawImage(fire, 0, 0, null);
 
         timer.start();
