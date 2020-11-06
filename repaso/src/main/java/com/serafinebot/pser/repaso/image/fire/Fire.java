@@ -1,4 +1,4 @@
-package com.serafinebot.pser.repaso.image;
+package com.serafinebot.pser.repaso.image.fire;
 
 import com.serafinebot.pser.repaso.util.ImageUtils;
 
@@ -16,20 +16,7 @@ public class Fire {
         Image image = Fire.createFireImage(IMAGE_WIDTH, IMAGE_HEIGHT);
 
         // display all of the images that we've processed
-        JFrame frame = new JFrame("Fire");
-        frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT + 22);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-
-        JLabel label = new JLabel(new ImageIcon(image.getScaledInstance(WINDOW_WIDTH, WINDOW_HEIGHT, Image.SCALE_DEFAULT)));
-        label.setLocation(0, 0);
-        panel.add(label);
-
-        frame.getContentPane().add(panel, BorderLayout.CENTER);
-        frame.setVisible(true);
+         
     }
 
     public static Image createFireImage(int width, int height) {

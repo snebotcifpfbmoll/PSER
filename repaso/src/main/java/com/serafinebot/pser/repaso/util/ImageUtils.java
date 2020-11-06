@@ -24,6 +24,49 @@ public class ImageUtils {
         return K == 0 ? 1 : K;
     }
 
+    public static int calculateK(byte[] conv) {
+        int K = 0;
+        for (int i = 0; i < conv.length; i++) {
+            K += conv[i];
+        }
+        return K == 0 ? 1 : K;
+    }
+
+    public static byte[] convolution(byte[] src, int width, int height, int pro, int startX, int startY, int endX, int endY, byte[] conv) {
+        byte[] ret = src.clone();
+        int K = calculateK(conv);
+
+        int conv_diff = conv.length / 2;
+        if (startX < conv_diff) startX = conv_diff;
+        //if (startY < conv_diff) startY = conv_diff;
+        if (endX > width - conv_diff) endX = width - conv_diff;
+        //if (endY > height - conv_diff) endY = height - conv_diff;
+
+        for (int y = startY; y < endY; y++) {
+            for (int x = startX; x < endX; x++) {
+                for (int z = 0; z < pro; z++) {
+                    Integer sum = 0;
+                    int index = ((y - conv_diff) * width * pro) + ((x - conv_diff) * pro) + z;
+                    for (int i = 0; i < conv.length; i++) {
+                        sum += Byte.toUnsignedInt(src[index]) * conv[i];
+                        index += pro;
+                    }
+                    index = (y * width * pro) + (x * pro) + z;
+                    sum /= K;
+                    if (sum > 255) {
+                        sum = 255;
+                    } else if (sum < 0) {
+                        sum = 0;
+                    }
+
+                    ret[index] = sum.byteValue();
+                }
+            }
+        }
+
+        return ret;
+    }
+
     public static byte[] convolution(byte[] src, int width, int height, int pro, int startX, int startY, int endX, int endY, byte[][] conv) {
         if (conv.length != conv[0].length) return null;
 
