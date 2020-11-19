@@ -2,8 +2,8 @@ package com.snebot.fbmoll.data;
 
 public class ConvolutionData {
     private final int MATRIX_SIZE = 3;
-    private String name = null;
-    private int[][] matrix = new int[MATRIX_SIZE][MATRIX_SIZE];
+    private String name;
+    private int[][] matrix;
     private int k = 1;
 
     public int[][] getMatrix() {

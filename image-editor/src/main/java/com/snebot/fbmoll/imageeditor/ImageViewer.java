@@ -1,6 +1,8 @@
 package com.snebot.fbmoll.imageeditor;
 
 import com.snebot.fbmoll.data.ConvolutionData;
+import com.snebot.fbmoll.imageeditor.fire.ColorPalette;
+import com.snebot.fbmoll.imageeditor.fire.Flame;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -12,8 +14,12 @@ public class ImageViewer extends Canvas {
     public int width = 0;
     public int height = 0;
 
+    // conf
+    private int temperatureThreshold = 128;
+
     // UI
     private Image sourceImage = null;
+    private Image convolutionImage = null;
     private Image resultImage = null;
 
     public ImageViewer() {
@@ -74,16 +80,52 @@ public class ImageViewer extends Canvas {
         return image;
     }
 
-    public static BufferedImage copy(BufferedImage bi) {
+    public BufferedImage copy(BufferedImage bi) {
         ColorModel cm = bi.getColorModel();
         boolean alpha = cm.isAlphaPremultiplied();
         WritableRaster raster = bi.copyData(null);
         return new BufferedImage(cm, raster, alpha, null);
     }
 
+    public int getAverage(Color color) {
+        return color.getRed() + color.getGreen() + color.getBlue() / 3;
+    }
+
+    public byte[][] createTemperatureMap(Image image) {
+        if (!(image instanceof BufferedImage)) return null;
+        BufferedImage bufferedImage = (BufferedImage)image;
+        int imageWidth = bufferedImage.getWidth(null);
+        int imageHeight = bufferedImage.getHeight(null);
+
+        byte[][] tempMap = new byte[imageHeight][imageWidth];
+        for (int i = 0; i < imageHeight; i++) {
+            for (int j = 0; j < imageWidth; j++) {
+                int avg = getAverage(new Color(bufferedImage.getRGB(j, i)));
+                if (avg >= temperatureThreshold) tempMap[i][j] = 1;
+            }
+        }
+        return tempMap;
+    }
+
+    private Image createImageFromTempMap(byte[][] temp) {
+        if (temp == null) return null;
+        int width = temp[0].length;
+        int height = temp.length;
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                Color color = temp[i][j] == 1 ? Color.WHITE : Color.BLACK;
+                image.setRGB(j, i, color.getRGB());
+            }
+        }
+        return image;
+    }
+
     public void process(BufferedImage image, ConvolutionData data) {
         sourceImage = image;
-        resultImage = convolution(image, data.getMatrix(), data.getK());
+        convolutionImage = convolution(image, data.getMatrix(), data.getK());
+
+
         validate();
         repaint();
     }
@@ -96,9 +138,11 @@ public class ImageViewer extends Canvas {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        if (sourceImage != null && resultImage != null) {
-            double targetWidth = this.width / 1.5D;
-            double targetHeight = this.height / 1.5D;
+        byte[][] map = createTemperatureMap(convolutionImage);
+        resultImage = createImageFromTempMap(map);
+        if (sourceImage != null && convolutionImage != null && resultImage != null) {
+            double targetWidth = this.width * 0.5D;
+            double targetHeight = this.height * 0.5D;
             double width = sourceImage.getWidth(null);
             double height = sourceImage.getHeight(null);
             double widthRatio = targetWidth / width;
@@ -107,7 +151,28 @@ public class ImageViewer extends Canvas {
             int newWidth = (int)(width * ratio);
             int newHeight = (int)(height * ratio);
             g.drawImage(sourceImage.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT), 0, 0, null);
-            g.drawImage(resultImage.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT), 0, newHeight, null);
+            g.drawImage(convolutionImage.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT), newWidth, 0, null);
+            g.drawImage(resultImage.getScaledInstance(newWidth * 2, newHeight * 2, Image.SCALE_DEFAULT), 0, newHeight, null);
+
+            // fire
+            ColorPalette cp = new ColorPalette(256);
+            cp.addColor(new Color(0, 0, 0, 0), 0);
+            cp.addColor(new Color(255, 50, 50, 64), 64);
+            cp.addColor(new Color(255, 255, 120, 255), 80);
+            cp.addColor(new Color(240, 115, 120, 255), 100);
+            cp.addColor(new Color(80, 110, 190, 192), 128);
+            cp.addColor(new Color(90, 165, 235, 128), 165);
+            cp.addColor(new Color(255, 255, 255, 255), 255);
+            cp.generatePalette();
+
+            Flame flame = new Flame(sourceImage.getWidth(null), sourceImage.getHeight(null), cp, 30);
+            for (int i = 0; i < 10; i++) {
+                flame.coolSparks(map);
+                flame.addSparks(map);
+                flame.processBuffer();
+            }
+            Image fire = flame.processImage();
+            g.drawImage(fire.getScaledInstance(newWidth * 2, newHeight * 2, Image.SCALE_DEFAULT), 0, newHeight, null);
         }
     }
 }

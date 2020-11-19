@@ -9,8 +9,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class ImageEditor extends JFrame implements ControlPanelDelegate {
-    private int width = 1200;
-    private int height = width / 16 * 9;
+    private static final String testPath = "/Users/hystrix/Development/DAM/PSER/image-editor/src/main/resources/image-1920x1080-4.jpg";
+    private int width = 1400;
+    private int height = 850;
 
     // UI
     private ImageViewer imageViewer = null;
@@ -63,6 +64,7 @@ public class ImageEditor extends JFrame implements ControlPanelDelegate {
     public void didApplyChanges(String sourcePath, ConvolutionData data) {
         if (imageViewer == null) return;
         try {
+            if (sourcePath == null || sourcePath.equals("")) sourcePath = testPath;
             File file = new File(sourcePath);
             BufferedImage image = ImageIO.read(file);
             imageViewer.process(image, data);
