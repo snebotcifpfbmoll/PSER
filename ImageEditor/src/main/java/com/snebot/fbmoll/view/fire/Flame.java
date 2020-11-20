@@ -47,6 +47,7 @@ public class Flame {
     private void coolSparks() {
         int[] buffer = getBuffer();
         for (Integer[] coord : map) {
+            if (coord[0] >= width || coord[1] >= height) continue;
             int index = coord[1] * width + coord[0];
             int random = (int) (Math.random() * 100);
             if (random < flameData.sparkPercentage) buffer[index] = 0;
@@ -57,6 +58,7 @@ public class Flame {
         int[] buffer = getBuffer();
         int max_value = flameData.colorPalette.getMaxValue();
         for (Integer[] coord : map) {
+            if (coord[0] >= width || coord[1] >= height) continue;
             int index = coord[1] * width + coord[0];
             int random = (int) (Math.random() * 100);
             if (random < flameData.sparkPercentage) buffer[index] = max_value;

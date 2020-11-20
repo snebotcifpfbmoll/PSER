@@ -5,7 +5,6 @@ import com.snebot.fbmoll.data.FlameData;
 import com.snebot.fbmoll.view.fire.ColorPalette;
 import com.snebot.fbmoll.view.fire.Flame;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -13,23 +12,24 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 
-public class ImageViewer extends JPanel {
+public class ImageViewer extends Canvas implements Runnable {
     private int width = 1;
     private int height = 1;
-    private Thread flameThread = null;
-    private FlameView flameView = null;
+    private int delay = 100;
+    private boolean animate = true;
 
-    // UI
-    private final JLabel source = new JLabel(new ImageIcon());
-    private final JLabel convolution = new JLabel(new ImageIcon());
-    private final JLabel result = new JLabel(new ImageIcon());
+    private Image original = null;
+    private Image sourceImage = null;
+    private Image convolutionImage = null;
+    private Image resultImage = null;
+    private Flame flame = null;
 
-    public FlameView getFlameView() {
-        return flameView;
+    public int getDelay() {
+        return delay;
     }
 
-    public void setFlameView(FlameView flameView) {
-        this.flameView = flameView;
+    public void setDelay(int delay) {
+        this.delay = delay;
     }
 
     public ImageViewer() {
@@ -41,39 +41,6 @@ public class ImageViewer extends JPanel {
         this.width = width;
         this.height = height;
 
-        this.setLayout(new GridBagLayout());
-        this.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.anchor = GridBagConstraints.CENTER;
-        constraints.fill = GridBagConstraints.BOTH;
-        constraints.weightx = 0.1;
-        constraints.weighty = 0.4;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        add(source, constraints);
-
-        constraints.gridx = 1;
-        add(convolution, constraints);
-
-        constraints.weighty = 0.6;
-        constraints.gridx = 0;
-        constraints.gridy = constraints.gridheight;
-        constraints.gridwidth = 2;
-        result.setBackground(Color.BLACK);
-        result.setOpaque(true);
-        add(result, constraints);
-        /*flameView = new FlameView();
-        add(flameView, constraints);*/
-    }
-
-    public void start() {
-        if (flameView == null) return;
-        if (flameThread == null) flameThread = new Thread(flameView);
-        flameThread.start();
     }
 
     public byte[] convolution(byte[] src, int width, int height, int pro, int startX, int startY, int endX, int endY, int[][] conv, int K) {
@@ -151,8 +118,23 @@ public class ImageViewer extends JPanel {
         return map;
     }
 
+    private ArrayList<Integer[]> testMap(int w, int h) {
+        ArrayList<Integer[]> map = new ArrayList<>();
+        for (int y = h - 1; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                map.add(new Integer[]{x, y});
+            }
+        }
+        return map;
+    }
+
     private Image createImageFromTempMap(int width, int height, ArrayList<Integer[]> map) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                image.setRGB(x, y, Color.BLACK.getRGB());
+            }
+        }
         for (Integer[] coord : map) {
             image.setRGB(coord[0], coord[1], Color.WHITE.getRGB());
         }
@@ -168,23 +150,27 @@ public class ImageViewer extends JPanel {
         return new Dimension(newWidth, newHeight);
     }
 
+    private Image resize(Image image, int width, int height) {
+        int imageWidth = image.getWidth(null);
+        int imageHeight = image.getHeight(null);
+        Dimension dimen = resize(imageWidth, imageHeight, width, height);
+        return image.getScaledInstance(dimen.width, dimen.height, Image.SCALE_DEFAULT);
+    }
+
     public void process(BufferedImage image, ConvolutionData data) {
-        Dimension dimen = resize(image.getWidth(), image.getHeight(), source.getWidth(), source.getHeight());
-        Image sourceImage = image.getScaledInstance(dimen.width, dimen.height, Image.SCALE_DEFAULT);
-        source.setIcon(new ImageIcon(sourceImage));
+        int targetWidth = image.getWidth() / 6;
+        int targetHeight = image.getHeight() / 6;
+        this.original = image;
+        this.sourceImage = resize(image, targetWidth, targetHeight);
 
-        Image convolutionResult = convolution(image, data.matrix, data.k);
-        dimen = resize(convolutionResult.getWidth(null), convolutionResult.getHeight(null), convolution.getWidth(), convolution.getHeight());
-        Image convolutionImage = convolutionResult.getScaledInstance(dimen.width, dimen.height, Image.SCALE_DEFAULT);
-        convolution.setIcon(new ImageIcon(convolutionImage));
+        Image convolutionImage = convolution(image, data.matrix, data.k);
+        this.convolutionImage = resize(convolutionImage, targetWidth, targetHeight);
 
-        ArrayList<Integer[]> map = createTemperatureMap(convolutionResult, 128);
-        Image tempMapImage = createImageFromTempMap(convolutionResult.getWidth(null), convolutionResult.getHeight(null), map);
-        dimen = resize(tempMapImage.getWidth(null), tempMapImage.getHeight(null), result.getWidth(), result.getHeight());
-        Image resultImage = tempMapImage.getScaledInstance(dimen.width, dimen.height, Image.SCALE_DEFAULT);
-        result.setIcon(new ImageIcon(resultImage));
+        ArrayList<Integer[]> map = createTemperatureMap(convolutionImage, 128);
+        Image resultImage = createImageFromTempMap(convolutionImage.getWidth(null), convolutionImage.getHeight(null), map);
+        this.resultImage = resize(resultImage, targetWidth, targetHeight);
 
-        /*ColorPalette cp = new ColorPalette(256);
+        ColorPalette cp = new ColorPalette(256);
         cp.addColor(new Color(0, 0, 0, 0), 0);
         cp.addColor(new Color(255, 50, 50, 64), 64);
         cp.addColor(new Color(255, 255, 120, 255), 80);
@@ -193,7 +179,17 @@ public class ImageViewer extends JPanel {
         cp.addColor(new Color(90, 165, 235, 128), 165);
         cp.addColor(new Color(255, 255, 255, 255), 255);
         cp.generatePalette();
-        FlameData flameData = new FlameData(cp, 30);
+        FlameData flameData = new FlameData(cp, 10);
+        flameData.mult_left = 1.2D;
+        flameData.mult = 1.5D;
+        flameData.mult_right = 1.2D;
+        flameData.mult_bottom_left = 0.1D;
+        flameData.mult_bottom = 0.1D;
+        flameData.mult_bottom_right = 0.1D;
+        flameData.divisor = 5.995D;
+        flameData.constant = 0.37D;
+        this.flame = new Flame(resultImage.getWidth(null), resultImage.getHeight(null), flameData, map);
+        /*
         flameData.mult_left = 1.2D;
         flameData.mult = 1.5D;
         flameData.mult_right = 1.2D;
@@ -202,10 +198,47 @@ public class ImageViewer extends JPanel {
         flameData.mult_bottom_right = 0.7D;
         flameData.divisor = 5.995D;
         flameData.constant = 0.37D;
+        * */
+    }
 
-        Flame flame = new Flame(dimen.width, dimen.height, flameData, map);
-        flameView.setFlame(flame);
-        start();*/
+    private void paint() {
+        Graphics g = this.getGraphics();
+        if (g == null) return;
+        g.clearRect(0, 0, width, height);
+        int xOffset = 0;
+        if (sourceImage != null) {
+            g.drawImage(sourceImage, xOffset, 0, null);
+            xOffset += sourceImage.getWidth(null);
+        }
+        if (convolutionImage != null) {
+            g.drawImage(convolutionImage, xOffset, 0, null);
+            xOffset += convolutionImage.getWidth(null);
+        }
+        if (resultImage != null) {
+            g.drawImage(resultImage, xOffset, 0, null);
+            xOffset += resultImage.getWidth(null);
+        }
+        if (flame != null) {
+            int fireWidth = flame.getWidth() / 2;
+            int fireHeight = flame.getHeight() / 2;
+            //Image originalImage = this.original.getScaledInstance(fireWidth, fireHeight, Image.SCALE_DEFAULT);
+            Image fireImage = flame.process().getScaledInstance(fireWidth, fireHeight, Image.SCALE_DEFAULT);
+            //g.drawImage(originalImage, 0, sourceImage.getHeight(null), null);
+            g.drawImage(fireImage, 0, sourceImage.getHeight(null), null);
+        }
+    }
+
+    @Override
+    public void run() {
+        this.animate = true;
+        while (this.animate) {
+            try {
+                this.paint();
+                Thread.sleep(this.delay);
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
     }
 
     @Override

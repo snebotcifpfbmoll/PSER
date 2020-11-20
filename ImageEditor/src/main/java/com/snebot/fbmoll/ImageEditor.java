@@ -19,6 +19,7 @@ public class ImageEditor extends JFrame implements ControlPanelDelegate {
 
     // UI
     private ImageViewer imageViewer = null;
+    private Thread imageViewerThread = null;
 
     public ImageEditor() {
         super();
@@ -58,8 +59,10 @@ public class ImageEditor extends JFrame implements ControlPanelDelegate {
             File file = new File(sourcePath);
             BufferedImage image = ImageIO.read(file);
             imageViewer.process(image, convolutionData);
+            imageViewerThread = new Thread(imageViewer);
+            imageViewerThread.start();
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("main - Error: " + e.getMessage() + e.getClass());
         }
     }
 
