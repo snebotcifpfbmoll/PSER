@@ -4,13 +4,14 @@ import com.snebot.fbmoll.data.FlameData;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class Flame {
     private int width;
     private int height;
     private int[] buffer;
     private FlameData flameData;
-    private byte[][] sparkMap;
+    private ArrayList<Integer[]> map;
 
     public int getWidth() {
         return width;
@@ -36,37 +37,29 @@ public class Flame {
     private Flame() {
     }
 
-    public Flame(int width, int height, FlameData flameData, byte[][] sparkMap) {
+    public Flame(int width, int height, FlameData flameData, ArrayList<Integer[]> map) {
         this.width = width;
         this.height = height;
         this.flameData = flameData;
-        this.sparkMap = sparkMap;
+        this.map = map;
     }
 
     private void coolSparks() {
         int[] buffer = getBuffer();
-        for (int i = 0; i < sparkMap.length; i++) {
-            for (int j = 0; j < sparkMap[i].length; j++) {
-                if (sparkMap[i][j] == 1) {
-                    int index = (i * width) + j;
-                    int random = (int) (Math.random() * 100);
-                    if (random < flameData.sparkPercentage) buffer[index] = 0;
-                }
-            }
+        for (Integer[] coord : map) {
+            int index = coord[1] * width + coord[0];
+            int random = (int) (Math.random() * 100);
+            if (random < flameData.sparkPercentage) buffer[index] = 0;
         }
     }
 
     private void addSparks() {
         int[] buffer = getBuffer();
         int max_value = flameData.colorPalette.getMaxValue();
-        for (int i = 0; i < sparkMap.length; i++) {
-            for (int j = 0; j < sparkMap[i].length; j++) {
-                if (sparkMap[i][j] == 1) {
-                    int index = (i * width) + j;
-                    int random = (int) (Math.random() * 100);
-                    if (random < flameData.sparkPercentage) buffer[index] = max_value;
-                }
-            }
+        for (Integer[] coord : map) {
+            int index = coord[1] * width + coord[0];
+            int random = (int) (Math.random() * 100);
+            if (random < flameData.sparkPercentage) buffer[index] = max_value;
         }
     }
 

@@ -125,7 +125,6 @@ public class ImageViewer extends Canvas {
         sourceImage = image;
         convolutionImage = convolution(image, data.getMatrix(), data.getK());
 
-
         validate();
         repaint();
     }

@@ -6,7 +6,7 @@ import java.awt.*;
 
 public class FlameView extends Canvas implements Runnable {
     private Flame flame = null;
-    private int speed = 0;
+    private int delay = 100;
     public boolean animate = true;
 
     public Flame getFlame() {
@@ -18,21 +18,21 @@ public class FlameView extends Canvas implements Runnable {
     }
 
     public int getSpeed() {
-        return speed;
+        return delay;
     }
 
     public void setSpeed(int speed) {
-        this.speed = speed;
+        this.delay = speed;
     }
 
     public FlameView() {
         super();
     }
 
-    public FlameView(Flame flame, int speed) {
+    public FlameView(Flame flame, int delay) {
         super();
         this.flame = flame;
-        this.speed = speed;
+        this.delay = delay;
     }
 
     private void paint() {
@@ -45,9 +45,9 @@ public class FlameView extends Canvas implements Runnable {
     @Override
     public void run() {
         while (this.animate) {
+            this.paint();
             try {
-                this.paint();
-                Thread.sleep(this.speed);
+                Thread.sleep(this.delay);
             } catch (Exception e) {
                 System.out.println("Exception: " + e.getMessage());
             }
