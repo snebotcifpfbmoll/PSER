@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class ImageViewer extends Canvas implements Runnable {
     private int width = 1;
     private int height = 1;
-    private int delay = 100;
+    private int delay = 1000;
     private boolean animate = true;
 
     private Image original = null;
@@ -180,9 +180,9 @@ public class ImageViewer extends Canvas implements Runnable {
         cp.addColor(new Color(255, 255, 255, 255), 255);
         cp.generatePalette();
         FlameData flameData = new FlameData(cp, 10);
-        flameData.mult_left = 1.2D;
+        flameData.mult_left = 1.5D;
         flameData.mult = 1.5D;
-        flameData.mult_right = 1.2D;
+        flameData.mult_right = 1.5D;
         flameData.mult_bottom_left = 0.1D;
         flameData.mult_bottom = 0.1D;
         flameData.mult_bottom_right = 0.1D;
@@ -218,12 +218,12 @@ public class ImageViewer extends Canvas implements Runnable {
             g.drawImage(resultImage, xOffset, 0, null);
             xOffset += resultImage.getWidth(null);
         }
-        if (flame != null) {
+        if (flame != null && original != null) {
             int fireWidth = flame.getWidth() / 2;
             int fireHeight = flame.getHeight() / 2;
-            //Image originalImage = this.original.getScaledInstance(fireWidth, fireHeight, Image.SCALE_DEFAULT);
+            Image originalImage = this.original.getScaledInstance(fireWidth, fireHeight, Image.SCALE_DEFAULT);
             Image fireImage = flame.process().getScaledInstance(fireWidth, fireHeight, Image.SCALE_DEFAULT);
-            //g.drawImage(originalImage, 0, sourceImage.getHeight(null), null);
+            g.drawImage(originalImage, 0, sourceImage.getHeight(null), null);
             g.drawImage(fireImage, 0, sourceImage.getHeight(null), null);
         }
     }
