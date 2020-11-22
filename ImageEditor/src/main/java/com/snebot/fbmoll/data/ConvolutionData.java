@@ -4,6 +4,7 @@ public class ConvolutionData {
     public String name = null;
     public int[][] matrix;
     public int k = 1;
+    public int temperatureThreshold = 128;
 
     public ConvolutionData() {
     }

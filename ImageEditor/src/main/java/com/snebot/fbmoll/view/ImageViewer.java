@@ -2,7 +2,6 @@ package com.snebot.fbmoll.view;
 
 import com.snebot.fbmoll.data.ConvolutionData;
 import com.snebot.fbmoll.data.FlameData;
-import com.snebot.fbmoll.view.fire.ColorPalette;
 import com.snebot.fbmoll.view.fire.Flame;
 
 import java.awt.*;
@@ -18,6 +17,7 @@ public class ImageViewer extends Canvas implements Runnable {
     private int delay = 1000;
     private boolean animate = true;
 
+    private boolean update = true;
     private Image original = null;
     private Image sourceImage = null;
     private Image convolutionImage = null;
@@ -40,7 +40,6 @@ public class ImageViewer extends Canvas implements Runnable {
         super();
         this.width = width;
         this.height = height;
-
     }
 
     public byte[] convolution(byte[] src, int width, int height, int pro, int startX, int startY, int endX, int endY, int[][] conv, int K) {
@@ -157,38 +156,23 @@ public class ImageViewer extends Canvas implements Runnable {
         return image.getScaledInstance(dimen.width, dimen.height, Image.SCALE_DEFAULT);
     }
 
-    public void process(BufferedImage image, ConvolutionData data) {
-        int targetWidth = image.getWidth() / 6;
-        int targetHeight = image.getHeight() / 6;
+    public void process(BufferedImage image, ConvolutionData data, FlameData flameData) {
+        int targetWidth = this.width / 3;
+        double ratio = (double) image.getWidth() / image.getHeight();
+        int newHeight = (int) (targetWidth / ratio);
+        int newWidth = (int) (newHeight * ratio);
         this.original = image;
-        this.sourceImage = resize(image, targetWidth, targetHeight);
+        this.sourceImage = resize(image, newWidth, newHeight);
 
         Image convolutionImage = convolution(image, data.matrix, data.k);
-        this.convolutionImage = resize(convolutionImage, targetWidth, targetHeight);
+        this.convolutionImage = resize(convolutionImage, newWidth, newHeight);
 
-        ArrayList<Integer[]> map = createTemperatureMap(convolutionImage, 128);
+        ArrayList<Integer[]> map = createTemperatureMap(convolutionImage, data.temperatureThreshold);
         Image resultImage = createImageFromTempMap(convolutionImage.getWidth(null), convolutionImage.getHeight(null), map);
-        this.resultImage = resize(resultImage, targetWidth, targetHeight);
+        this.resultImage = resize(resultImage, newWidth, newHeight);
 
-        ColorPalette cp = new ColorPalette(256);
-        cp.addColor(new Color(0, 0, 0, 0), 0);
-        cp.addColor(new Color(255, 50, 50, 64), 64);
-        cp.addColor(new Color(255, 255, 120, 255), 80);
-        cp.addColor(new Color(240, 115, 120, 255), 100);
-        cp.addColor(new Color(80, 110, 190, 192), 128);
-        cp.addColor(new Color(90, 165, 235, 128), 165);
-        cp.addColor(new Color(255, 255, 255, 255), 255);
-        cp.generatePalette();
-        FlameData flameData = new FlameData(cp, 10);
-        flameData.mult_left = 1.5D;
-        flameData.mult = 1.5D;
-        flameData.mult_right = 1.5D;
-        flameData.mult_bottom_left = 0.1D;
-        flameData.mult_bottom = 0.1D;
-        flameData.mult_bottom_right = 0.1D;
-        flameData.divisor = 5.995D;
-        flameData.constant = 0.37D;
         this.flame = new Flame(resultImage.getWidth(null), resultImage.getHeight(null), flameData, map);
+        this.update = true;
         /*
         flameData.mult_left = 1.2D;
         flameData.mult = 1.5D;
@@ -204,27 +188,33 @@ public class ImageViewer extends Canvas implements Runnable {
     private void paint() {
         Graphics g = this.getGraphics();
         if (g == null) return;
-        g.clearRect(0, 0, width, height);
-        int xOffset = 0;
-        if (sourceImage != null) {
-            g.drawImage(sourceImage, xOffset, 0, null);
-            xOffset += sourceImage.getWidth(null);
-        }
-        if (convolutionImage != null) {
-            g.drawImage(convolutionImage, xOffset, 0, null);
-            xOffset += convolutionImage.getWidth(null);
-        }
-        if (resultImage != null) {
-            g.drawImage(resultImage, xOffset, 0, null);
-            xOffset += resultImage.getWidth(null);
+        if (update) {
+            int xOffset = 0;
+            if (sourceImage != null) {
+                g.drawImage(sourceImage, xOffset, 0, null);
+                xOffset += sourceImage.getWidth(null);
+            }
+            if (convolutionImage != null) {
+                g.drawImage(convolutionImage, xOffset, 0, null);
+                xOffset += convolutionImage.getWidth(null);
+            }
+            if (resultImage != null) {
+                g.drawImage(resultImage, xOffset, 0, null);
+                xOffset += resultImage.getWidth(null);
+            }
+            update = false;
         }
         if (flame != null && original != null) {
-            int fireWidth = flame.getWidth() / 2;
-            int fireHeight = flame.getHeight() / 2;
+            int targetWidth = this.width;
+            double ratio = (double) flame.getWidth() / flame.getHeight();
+            int fireHeight = (int) (targetWidth / ratio);
+            int fireWidth = (int) (fireHeight * ratio);
+            int y = sourceImage.getHeight(null);
+            g.clearRect(0, y, width, height);
             Image originalImage = this.original.getScaledInstance(fireWidth, fireHeight, Image.SCALE_DEFAULT);
             Image fireImage = flame.process().getScaledInstance(fireWidth, fireHeight, Image.SCALE_DEFAULT);
-            g.drawImage(originalImage, 0, sourceImage.getHeight(null), null);
-            g.drawImage(fireImage, 0, sourceImage.getHeight(null), null);
+            g.drawImage(originalImage, 0, y, null);
+            g.drawImage(fireImage, 0, y, null);
         }
     }
 
@@ -236,7 +226,8 @@ public class ImageViewer extends Canvas implements Runnable {
                 this.paint();
                 Thread.sleep(this.delay);
             } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println("ImageViewer - Error: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }

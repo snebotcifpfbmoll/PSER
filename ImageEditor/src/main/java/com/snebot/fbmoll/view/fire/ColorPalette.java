@@ -29,7 +29,7 @@ public class ColorPalette {
         return colorMap;
     }
 
-    private ColorPalette() { }
+    public ColorPalette() { }
 
     public ColorPalette(int size) {
         this.size = size;
@@ -42,7 +42,9 @@ public class ColorPalette {
     }
 
     public void addColor(Color color, int index) {
-        if (index < size && !colorMap.containsKey(index)) colorMap.put(index, color);
+        while (index < size && colorMap.containsKey(index)) index++;
+        if (index >= size) setSize(index + 1);
+        colorMap.put(index, color);
     }
 
     public void removeColor(int key) {

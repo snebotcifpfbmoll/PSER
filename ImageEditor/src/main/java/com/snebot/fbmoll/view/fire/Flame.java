@@ -10,8 +10,8 @@ public class Flame {
     private int width;
     private int height;
     private int[] buffer;
-    private FlameData flameData;
     private ArrayList<Integer[]> map;
+    public FlameData flameData;
 
     public int getWidth() {
         return width;

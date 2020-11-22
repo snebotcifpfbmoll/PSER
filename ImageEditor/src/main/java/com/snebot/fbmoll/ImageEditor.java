@@ -52,13 +52,11 @@ public class ImageEditor extends JFrame implements ControlPanelDelegate {
     }
 
     @Override
-    public void didApplyChanges(String sourcePath, ConvolutionData convolutionData, FlameData flameData) {
+    public void didApplyChanges(File file, ConvolutionData convolutionData, FlameData flameData) {
         if (imageViewer == null) return;
         try {
-            if (sourcePath == null || sourcePath.equals("")) sourcePath = TEST_PATH;
-            File file = new File(sourcePath);
             BufferedImage image = ImageIO.read(file);
-            imageViewer.process(image, convolutionData);
+            imageViewer.process(image, convolutionData, flameData);
             imageViewerThread = new Thread(imageViewer);
             imageViewerThread.start();
         } catch (Exception e) {

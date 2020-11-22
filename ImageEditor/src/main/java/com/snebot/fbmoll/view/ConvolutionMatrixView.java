@@ -4,8 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ConvolutionMatrixView extends Container {
-    private int width = 0;
-    private int height = 0;
     private final int MATRIX_SIZE = 3;
     private int[][] matrix = new int[MATRIX_SIZE][MATRIX_SIZE];
 
@@ -18,15 +16,11 @@ public class ConvolutionMatrixView extends Container {
         updateMatrix();
     }
 
-    public ConvolutionMatrixView(int width, int heigth) {
-        this.width = width;
-        this.height = heigth;
+    public ConvolutionMatrixView() {
         setup();
     }
 
-    public ConvolutionMatrixView(int width, int heigth, int[][] matrix) {
-        this.width = width;
-        this.height = heigth;
+    public ConvolutionMatrixView(int[][] matrix) {
         this.matrix = matrix;
         setup();
     }
@@ -77,10 +71,5 @@ public class ConvolutionMatrixView extends Container {
             System.out.println("Error: " + e.getMessage());
         }
         return mat;
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(width, height);
     }
 }

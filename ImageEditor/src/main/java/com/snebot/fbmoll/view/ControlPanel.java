@@ -1,9 +1,12 @@
 package com.snebot.fbmoll.view;
 
 import com.snebot.fbmoll.data.ConvolutionData;
+import com.snebot.fbmoll.data.FlameData;
+import com.snebot.fbmoll.view.fire.ColorPalette;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 
 public class ControlPanel extends JPanel {
@@ -15,13 +18,45 @@ public class ControlPanel extends JPanel {
     private static final int SPARK_PERC_MIN = 0;
     private static final int SPARK_PERC_MAX = 100;
     private static final int SPARK_PERC_INIT = 10;
+    private static final int TEMP_THRESH_MIN = 0;
+    private static final int TEMP_THRESH_MAX = 255;
+    private static final int TEMP_THRESH_INIT = 128;
+
+    private static final FlameData DEFAULT_FLAME_DATA = new FlameData();
+    static {
+        final ColorPalette cp = new ColorPalette(256);
+        cp.addColor(new Color(0, 0, 0, 0), 0);
+        cp.addColor(new Color(255, 50, 50, 64), 64);
+        cp.addColor(new Color(255, 255, 120, 255), 80);
+        cp.addColor(new Color(240, 115, 120, 255), 100);
+        cp.addColor(new Color(80, 110, 190, 192), 128);
+        cp.addColor(new Color(90, 165, 235, 128), 165);
+        cp.addColor(new Color(255, 255, 255, 255), 255);
+        cp.generatePalette();
+        DEFAULT_FLAME_DATA.colorPalette = cp;
+        DEFAULT_FLAME_DATA.sparkPercentage = SPARK_PERC_INIT;
+        DEFAULT_FLAME_DATA.mult_left = 1.5D;
+        DEFAULT_FLAME_DATA.mult = 1.5D;
+        DEFAULT_FLAME_DATA.mult_right = 1.5D;
+        DEFAULT_FLAME_DATA.mult_bottom_left = 0.1D;
+        DEFAULT_FLAME_DATA.mult_bottom = 0.1D;
+        DEFAULT_FLAME_DATA.mult_bottom_right = 0.1D;
+        DEFAULT_FLAME_DATA.divisor = 5.995D;
+        DEFAULT_FLAME_DATA.constant = 0.37D;
+    }
 
     // UI
+    private final JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home"));
+    private ColorPaletteView paletteView = null;
+    private final JSlider sparkPercentage = new JSlider(SPARK_PERC_MIN, SPARK_PERC_MAX, DEFAULT_FLAME_DATA.sparkPercentage);
+    private final JSlider temperatureThreshold = new JSlider(TEMP_THRESH_MIN, TEMP_THRESH_MAX, TEMP_THRESH_INIT);
+    private final FireMultipliersView fireMult = new FireMultipliersView();
+    private final JTextField divisorText = new JTextField(String.valueOf(DEFAULT_FLAME_DATA.divisor));
+    private final JTextField constantText = new JTextField(String.valueOf(DEFAULT_FLAME_DATA.constant));
     private final ArrayList<ConvolutionData> convolutionMatrixData = new ArrayList<>();
     private final JComboBox<String> comboBox = new JComboBox<>();
-    private ConvolutionMatrixView matrixView = null;
-    private JTextField sourceField = null;
-    private JTextField kTextField = null;
+    private final ConvolutionMatrixView matrixView = new ConvolutionMatrixView();
+    private final JTextField kTextField = new JTextField("1");
 
     private ControlPanel() {
         super();
@@ -48,25 +83,60 @@ public class ControlPanel extends JPanel {
         constraints.anchor = GridBagConstraints.CENTER;
         int ylevel = 0;
 
-        // Source image
-        /*JLabel sourceLabel = new JLabel("Source file");
-        sourceLabel.setVerticalAlignment(JLabel.CENTER);
+        // File chooser
+        JLabel fileLabel = new JLabel("Source file");
+        fileLabel.setVerticalAlignment(JLabel.CENTER);
         constraints.gridx = 0;
         constraints.gridy = ylevel;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.insets = new Insets(5, 10, 0, 0);
-        panel.add(sourceLabel, constraints);
+        constraints.gridwidth = GRID_WIDTH;
+        constraints.gridheight = 1;
+        constraints.insets = new Insets(5, 10, 5, 10);
+        panel.add(fileLabel, constraints);
 
-        ylevel += constraints.gridheight;*/
+        ylevel += constraints.gridheight;
 
-        // File chooser
-        JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home"));
+        JTextArea filePath = new JTextArea();
+        filePath.setLineWrap(true);
+        filePath.setWrapStyleWord(true);
+        filePath.setEnabled(false);
+        constraints.gridy = ylevel;
+        panel.add(filePath, constraints);
+
+        fileChooser.addActionListener(e -> {
+            File file = fileChooser.getSelectedFile();
+            filePath.setText(file.getAbsolutePath());
+        });
+
+        ylevel += constraints.gridheight;
+
         constraints.gridx = 0;
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH;
         constraints.gridheight = constraints.gridwidth;
         constraints.insets = new Insets(0, 5, 0, 5);
         panel.add(fileChooser, constraints);
+
+        ylevel += constraints.gridheight;
+
+        // Color palette
+        JLabel colorPaletteLabel = new JLabel("Color Palette");
+        colorPaletteLabel.setVerticalAlignment(JLabel.CENTER);
+        constraints.gridx = 0;
+        constraints.gridy = ylevel;
+        constraints.gridwidth = GRID_WIDTH;
+        constraints.gridheight = 1;
+        constraints.insets = new Insets(5, 10, 5, 10);
+        panel.add(colorPaletteLabel, constraints);
+
+        ylevel += constraints.gridheight;
+
+        constraints.gridx = 0;
+        constraints.gridy = ylevel;
+        constraints.gridwidth = GRID_WIDTH;
+        constraints.gridheight = 6;
+        constraints.insets = new Insets(0, 0, 0, 0);
+        this.paletteView = new ColorPaletteView(this.width, this.width / 2, DEFAULT_FLAME_DATA.colorPalette);
+        panel.add(paletteView, constraints);
 
         ylevel += constraints.gridheight;
 
@@ -83,7 +153,6 @@ public class ControlPanel extends JPanel {
         ylevel += constraints.gridheight;
 
         // Spark percentage
-        JSlider sparkPercentage = new JSlider(SPARK_PERC_MIN, SPARK_PERC_MAX, SPARK_PERC_INIT);
         constraints.gridx = 0;
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH - 1;
@@ -105,8 +174,41 @@ public class ControlPanel extends JPanel {
 
         ylevel += constraints.gridheight;
 
+        // Temperature threshold
+        JLabel tempLabel = new JLabel("Temperature threshold");
+        tempLabel.setVerticalAlignment(JLabel.CENTER);
+        constraints.gridx = 0;
+        constraints.gridy = ylevel;
+        constraints.gridwidth = GRID_WIDTH;
+        constraints.gridheight = 1;
+        constraints.insets = new Insets(5, 10, 5, 10);
+        panel.add(tempLabel, constraints);
+
+        ylevel += constraints.gridheight;
+
+        constraints.gridx = 0;
+        constraints.gridy = ylevel;
+        constraints.gridwidth = GRID_WIDTH - 1;
+        constraints.gridheight = 1;
+        constraints.insets = new Insets(0, 0, 5, 0);
+        panel.add(temperatureThreshold, constraints);
+
+        JLabel tempThresholdLabel = new JLabel(String.valueOf(TEMP_THRESH_INIT));
+        tempLabel.setVerticalAlignment(JLabel.CENTER);
+        constraints.gridx = constraints.gridwidth;
+        constraints.gridy = ylevel;
+        constraints.gridwidth = GRID_WIDTH - constraints.gridwidth;
+        constraints.gridheight = 1;
+        panel.add(tempThresholdLabel, constraints);
+
+        temperatureThreshold.addChangeListener(e -> {
+            tempThresholdLabel.setText(String.valueOf(temperatureThreshold.getValue()));
+        });
+
+        ylevel += constraints.gridheight;
+
         // Fire multipliers
-        FireMultipliersView fireMult = new FireMultipliersView();
+        fireMult.setData(DEFAULT_FLAME_DATA);
         constraints.gridx = 0;
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH - 1;
@@ -126,7 +228,6 @@ public class ControlPanel extends JPanel {
         constraints.gridheight = 1;
         panel.add(divisorLabel, constraints);
 
-        JTextField divisorText = new JTextField("1.0");
         divisorText.setHorizontalAlignment(JTextField.CENTER);
         constraints.gridx = 1;
         constraints.gridy = ylevel;
@@ -146,7 +247,6 @@ public class ControlPanel extends JPanel {
         constraints.gridheight = 1;
         panel.add(constantLabel, constraints);
 
-        JTextField constantText = new JTextField("0.0");
         constantText.setHorizontalAlignment(JTextField.CENTER);
         constraints.gridx = 1;
         constraints.gridy = ylevel;
@@ -188,7 +288,6 @@ public class ControlPanel extends JPanel {
         panel.add(comboBox, constraints);
 
         // Convolution Matrix View
-        matrixView = new ConvolutionMatrixView(this.width, this.width);
         constraints.gridx = 0;
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH - 1;
@@ -211,7 +310,6 @@ public class ControlPanel extends JPanel {
         panel.add(kLabel, constraints);
 
         // K Text
-        kTextField = new JTextField("1");
         kTextField.setHorizontalAlignment(JTextField.CENTER);
         constraints.gridx = 1;
         constraints.gridwidth = 1;
@@ -239,7 +337,7 @@ public class ControlPanel extends JPanel {
         JScrollPane scroll = new JScrollPane(panel);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scroll.setMinimumSize(new Dimension(width, height));
+        scroll.setMinimumSize(new Dimension(width + 20, height));
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.weightx = 1;
@@ -283,12 +381,31 @@ public class ControlPanel extends JPanel {
     }
 
     public void didPressApplyButton() {
-        if (delegate == null || sourceField == null) return;
-        delegate.didApplyChanges(sourceField.getText(), getConvolutionData(), null);
+        File file = fileChooser.getSelectedFile();
+        FlameData flameData = fireMult.getData();
+        flameData.colorPalette = DEFAULT_FLAME_DATA.colorPalette;
+        flameData.sparkPercentage = this.sparkPercentage.getValue();
+        ConvolutionData convolutionData = getConvolutionData();
+        convolutionData.temperatureThreshold = this.temperatureThreshold.getValue();
+
+        try {
+            flameData.divisor = Double.parseDouble(divisorText.getText());
+            if (flameData.divisor == 0.0D) {
+                divisorText.setText("1.0");
+                flameData.divisor = 1.0;
+            }
+            flameData.constant = Double.parseDouble(constantText.getText());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        if (delegate == null || file == null) return;
+        delegate.didApplyChanges(file, convolutionData, flameData);
     }
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(width, height);
+        return super.getPreferredSize();
+        //return new Dimension(width, height);
     }
 }
