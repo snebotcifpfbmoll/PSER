@@ -25,6 +25,7 @@ public class ControlPanel extends JPanel {
     private static final FlameData DEFAULT_FLAME_DATA = new FlameData();
     static {
         final ColorPalette cp = new ColorPalette(256);
+        Color c = new Color(0, 0, 0, 0);
         cp.addColor(new Color(0, 0, 0, 0), 0);
         cp.addColor(new Color(255, 50, 50, 64), 64);
         cp.addColor(new Color(255, 255, 120, 255), 80);
@@ -383,7 +384,7 @@ public class ControlPanel extends JPanel {
     public void didPressApplyButton() {
         File file = fileChooser.getSelectedFile();
         FlameData flameData = fireMult.getData();
-        flameData.colorPalette = DEFAULT_FLAME_DATA.colorPalette;
+        flameData.colorPalette = paletteView.getColorPalette();
         flameData.sparkPercentage = this.sparkPercentage.getValue();
         ConvolutionData convolutionData = getConvolutionData();
         convolutionData.temperatureThreshold = this.temperatureThreshold.getValue();

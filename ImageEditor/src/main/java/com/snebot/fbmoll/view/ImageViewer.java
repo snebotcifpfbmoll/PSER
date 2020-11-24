@@ -4,6 +4,7 @@ import com.snebot.fbmoll.data.ConvolutionData;
 import com.snebot.fbmoll.data.FlameData;
 import com.snebot.fbmoll.view.fire.Flame;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -14,10 +15,12 @@ import java.util.ArrayList;
 public class ImageViewer extends Canvas implements Runnable {
     private int width = 1;
     private int height = 1;
-    private int delay = 1000;
+    private int delay = 10;
     private boolean animate = true;
+    private Timer timer = null;
 
     private boolean update = true;
+    private Thread flameThread = null;
     private Image original = null;
     private Image sourceImage = null;
     private Image convolutionImage = null;
@@ -40,6 +43,9 @@ public class ImageViewer extends Canvas implements Runnable {
         super();
         this.width = width;
         this.height = height;
+        timer = new Timer(this.delay, e -> {
+            paint();
+        });
     }
 
     public byte[] convolution(byte[] src, int width, int height, int pro, int startX, int startY, int endX, int endY, int[][] conv, int K) {
@@ -171,6 +177,7 @@ public class ImageViewer extends Canvas implements Runnable {
         Image resultImage = createImageFromTempMap(convolutionImage.getWidth(null), convolutionImage.getHeight(null), map);
         this.resultImage = resize(resultImage, newWidth, newHeight);
 
+        map = testMap(resultImage.getWidth(null), resultImage.getHeight(null));
         this.flame = new Flame(resultImage.getWidth(null), resultImage.getHeight(null), flameData, map);
         this.update = true;
         /*
@@ -205,31 +212,34 @@ public class ImageViewer extends Canvas implements Runnable {
             update = false;
         }
         if (flame != null && original != null) {
-            int targetWidth = this.width;
-            double ratio = (double) flame.getWidth() / flame.getHeight();
-            int fireHeight = (int) (targetWidth / ratio);
-            int fireWidth = (int) (fireHeight * ratio);
             int y = sourceImage.getHeight(null);
-            g.clearRect(0, y, width, height);
-            Image originalImage = this.original.getScaledInstance(fireWidth, fireHeight, Image.SCALE_DEFAULT);
-            Image fireImage = flame.process().getScaledInstance(fireWidth, fireHeight, Image.SCALE_DEFAULT);
-            g.drawImage(originalImage, 0, y, null);
-            g.drawImage(fireImage, 0, y, null);
+            //Image originalImage = this.original.getScaledInstance(fireWidth, fireHeight, Image.SCALE_DEFAULT);
+            //Image result = resize(flame.process(), this.width, this.height - y);
+            //System.out.printf("x: %d, y: %d\n", result.getWidth(null), result.getHeight(null));
+            g.clearRect(0, y, width, height - y);
+            //g.drawImage(originalImage, 0, y, null);
+            Image result = resize(flame, this.width, this.height - y);
+            g.drawImage(result, 0, y, null);
         }
     }
 
     @Override
     public void run() {
-        this.animate = true;
+        if (flame != null) {
+            this.flameThread = new Thread(flame);
+            this.flameThread.start();
+        }
+        if (timer != null) timer.start();
+        /*this.animate = true;
         while (this.animate) {
+            this.paint();
             try {
-                this.paint();
                 Thread.sleep(this.delay);
             } catch (Exception e) {
                 System.out.println("ImageViewer - Error: " + e.getMessage());
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     @Override

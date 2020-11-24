@@ -32,7 +32,7 @@ public class ImageEditor extends JFrame implements ControlPanelDelegate {
         constraints.anchor = GridBagConstraints.CENTER;
         constraints.fill = GridBagConstraints.BOTH;
 
-        ControlPanel controlPanel = new ControlPanel(WINDOW_WIDTH / 4, WINDOW_HEIGHT);
+        ControlPanel controlPanel = new ControlPanel(WINDOW_WIDTH / 4, WINDOW_HEIGHT * 2);
         controlPanel.delegate = this;
         constraints.gridx = 0;
         constraints.gridy = 0;
