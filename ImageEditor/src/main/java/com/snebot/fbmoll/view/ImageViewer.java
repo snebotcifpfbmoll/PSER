@@ -50,8 +50,8 @@ public class ImageViewer extends Canvas implements Runnable {
 
     public byte[] convolution(byte[] src, int width, int height, int pro, int startX, int startY, int endX, int endY, int[][] conv, int K) {
         if (conv.length != conv[0].length) return null;
-
-        byte[] ret = src.clone();
+        byte[] ret = new byte[src.length];
+        //byte[] ret = src.clone();
 
         int conv_diff = conv.length / 2;
         if (startX < conv_diff) startX = conv_diff;
@@ -180,16 +180,6 @@ public class ImageViewer extends Canvas implements Runnable {
         map = testMap(resultImage.getWidth(null), resultImage.getHeight(null));
         this.flame = new Flame(resultImage.getWidth(null), resultImage.getHeight(null), flameData, map);
         this.update = true;
-        /*
-        flameData.mult_left = 1.2D;
-        flameData.mult = 1.5D;
-        flameData.mult_right = 1.2D;
-        flameData.mult_bottom_left = 0.7D;
-        flameData.mult_bottom = 0.738D;
-        flameData.mult_bottom_right = 0.7D;
-        flameData.divisor = 5.995D;
-        flameData.constant = 0.37D;
-        * */
     }
 
     private void paint() {
@@ -207,19 +197,14 @@ public class ImageViewer extends Canvas implements Runnable {
             }
             if (resultImage != null) {
                 g.drawImage(resultImage, xOffset, 0, null);
-                xOffset += resultImage.getWidth(null);
             }
             update = false;
         }
         if (flame != null && original != null) {
             int y = sourceImage.getHeight(null);
-            //Image originalImage = this.original.getScaledInstance(fireWidth, fireHeight, Image.SCALE_DEFAULT);
-            //Image result = resize(flame.process(), this.width, this.height - y);
-            //System.out.printf("x: %d, y: %d\n", result.getWidth(null), result.getHeight(null));
             g.clearRect(0, y, width, height - y);
-            //g.drawImage(originalImage, 0, y, null);
-            Image result = resize(flame, this.width, this.height - y);
-            g.drawImage(result, 0, y, null);
+            //g.drawImage(this.original, 0, y, null);
+            g.drawImage(flame, 0, y, null);
         }
     }
 

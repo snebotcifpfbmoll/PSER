@@ -25,7 +25,6 @@ public class ControlPanel extends JPanel {
     private static final FlameData DEFAULT_FLAME_DATA = new FlameData();
     static {
         final ColorPalette cp = new ColorPalette(256);
-        Color c = new Color(0, 0, 0, 0);
         cp.addColor(new Color(0, 0, 0, 0), 0);
         cp.addColor(new Color(255, 50, 50, 64), 64);
         cp.addColor(new Color(255, 255, 120, 255), 80);
@@ -36,14 +35,14 @@ public class ControlPanel extends JPanel {
         cp.generatePalette();
         DEFAULT_FLAME_DATA.colorPalette = cp;
         DEFAULT_FLAME_DATA.sparkPercentage = SPARK_PERC_INIT;
-        DEFAULT_FLAME_DATA.mult_left = 1.5D;
+        DEFAULT_FLAME_DATA.mult_left = 1.2D;
         DEFAULT_FLAME_DATA.mult = 1.5D;
-        DEFAULT_FLAME_DATA.mult_right = 1.5D;
-        DEFAULT_FLAME_DATA.mult_bottom_left = 0.1D;
-        DEFAULT_FLAME_DATA.mult_bottom = 0.1D;
-        DEFAULT_FLAME_DATA.mult_bottom_right = 0.1D;
-        DEFAULT_FLAME_DATA.divisor = 5.995D;
-        DEFAULT_FLAME_DATA.constant = 0.37D;
+        DEFAULT_FLAME_DATA.mult_right = 1.2D;
+        DEFAULT_FLAME_DATA.mult_bottom_left = 0.7D;
+        DEFAULT_FLAME_DATA.mult_bottom = 0.738D;
+        DEFAULT_FLAME_DATA.mult_bottom_right = 0.7D;
+        DEFAULT_FLAME_DATA.divisor = 5.999D;
+        DEFAULT_FLAME_DATA.constant = 0.4D;
     }
 
     // UI
