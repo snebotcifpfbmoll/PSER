@@ -45,7 +45,6 @@ public class ControlPanel extends JPanel {
         cp.addColor(new Color(90, 165, 235, 128), 165);
         cp.addColor(new Color(255, 255, 255, 255), 255);
         * */
-        cp.generatePalette();
         DEFAULT_FLAME_DATA.colorPalette = cp;
         DEFAULT_FLAME_DATA.sparkPercentage = SPARK_PERC_INIT;
         DEFAULT_FLAME_DATA.mult_left = 1.2D;
@@ -419,6 +418,5 @@ public class ControlPanel extends JPanel {
     @Override
     public Dimension getPreferredSize() {
         return super.getPreferredSize();
-        //return new Dimension(width, height);
     }
 }

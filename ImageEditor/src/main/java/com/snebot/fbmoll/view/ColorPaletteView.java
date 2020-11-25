@@ -9,9 +9,11 @@ import java.util.ArrayList;
 public class ColorPaletteView extends JComponent {
     private int viewWidth = 0;
     private int viewHeight = 0;
+    private final JButton removeButton = new JButton("-");
     private final JButton addButton = new JButton("+");
     private final JTextField numColors = new JTextField("0");
     private final JScrollPane tableScroll = new JScrollPane();
+    private JTable table = null;
     private ColorPalette colorPalette = new ColorPalette();
 
     private static final String[] TABLE_COLUMN_NAMES = new String[]{"Red", "Green", "Blue", "Alpha", "Index"};
@@ -34,6 +36,7 @@ public class ColorPaletteView extends JComponent {
     }
 
     public ColorPalette getColorPalette() {
+        this.colorPalette.generatePalette();
         return colorPalette;
     }
 
@@ -80,6 +83,22 @@ public class ColorPaletteView extends JComponent {
         constraints.gridx = 1;
         constraints.gridy = ylevel;
         constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(0, 0, 0, 0);
+        constraints.anchor = GridBagConstraints.LINE_END;
+        this.add(this.removeButton, constraints);
+        this.removeButton.addActionListener(e -> {
+            int row = this.table.getSelectedRow();
+            Integer[] indicies = colorPalette.getColorMapIndicies();
+            if (row >= 0 && row < indicies.length) {
+                Integer key = indicies[row];
+                colorPalette.removeColor(key);
+                updateColorPalette();
+            }
+        });
+
+        constraints.gridx = 2;
+        constraints.gridy = ylevel;
+        constraints.fill = GridBagConstraints.NONE;
         constraints.insets = new Insets(0, 0, 0, 20);
         constraints.anchor = GridBagConstraints.LINE_END;
         this.add(this.addButton, constraints);
@@ -92,7 +111,7 @@ public class ColorPaletteView extends JComponent {
 
         constraints.gridx = 0;
         constraints.gridy = ylevel;
-        constraints.gridwidth = 2;
+        constraints.gridwidth = 3;
         constraints.gridheight = 10;
         constraints.fill = GridBagConstraints.BOTH;
         constraints.anchor = GridBagConstraints.CENTER;
@@ -117,7 +136,7 @@ public class ColorPaletteView extends JComponent {
             values.add(element);
         });
 
-        JTable table = new JTable(values.toArray(new Integer[0][0]), TABLE_COLUMN_NAMES);
+        table = new JTable(values.toArray(new Integer[0][0]), TABLE_COLUMN_NAMES);
         table.setFillsViewportHeight(true);
         this.tableScroll.setViewportView(table);
         this.numColors.setText(String.valueOf(this.colorPalette.getSize()));
