@@ -3,17 +3,19 @@ package com.snebot.fbmoll.view;
 import com.snebot.fbmoll.view.fire.ColorPalette;
 
 import javax.swing.*;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.Map;
 
-public class ColorPaletteView extends JComponent {
+public class ColorPaletteView extends JComponent implements TableModel {
     private int viewWidth = 0;
     private int viewHeight = 0;
     private final JButton removeButton = new JButton("-");
     private final JButton addButton = new JButton("+");
     private final JTextField numColors = new JTextField("0");
-    private final JScrollPane tableScroll = new JScrollPane();
-    private JTable table = null;
+    private final JTable table = new JTable(this);
+    private final JScrollPane tableScroll = new JScrollPane(table);
     private ColorPalette colorPalette = new ColorPalette();
 
     private static final String[] TABLE_COLUMN_NAMES = new String[]{"Red", "Green", "Blue", "Alpha", "Index"};
@@ -88,11 +90,11 @@ public class ColorPaletteView extends JComponent {
         this.add(this.removeButton, constraints);
         this.removeButton.addActionListener(e -> {
             int row = this.table.getSelectedRow();
-            Integer[] indicies = colorPalette.getColorMapIndicies();
-            if (row >= 0 && row < indicies.length) {
-                Integer key = indicies[row];
-                colorPalette.removeColor(key);
-                updateColorPalette();
+            int nrows = colorPalette.getColorMapIndicies().length;
+            if (row >= 0 && row < nrows) {
+                int index = (int) getValueAt(row, TABLE_COLUMN_NAMES.length - 1);
+                this.colorPalette.removeColor(index);
+                this.table.revalidate();
             }
         });
 
@@ -104,7 +106,7 @@ public class ColorPaletteView extends JComponent {
         this.add(this.addButton, constraints);
         this.addButton.addActionListener(e -> {
             this.colorPalette.addColor(new Color(0, 0, 0, 0), 0);
-            updateColorPalette();
+            this.table.revalidate();
         });
 
         ylevel += constraints.gridheight;
@@ -118,28 +120,98 @@ public class ColorPaletteView extends JComponent {
         constraints.insets = new Insets(0, 0, 0, 0);
         this.tableScroll.setMinimumSize(new Dimension(this.viewWidth, this.viewHeight));
         this.add(this.tableScroll, constraints);
-
-        // Post UI setup
-        updateColorPalette();
     }
 
-    public void updateColorPalette() {
-        ArrayList<Integer[]> values = new ArrayList<>();
-        this.colorPalette.getColorMap().forEach((index, color) -> {
-            Integer[] element = new Integer[]{
-                    color.getRed(),
-                    color.getGreen(),
-                    color.getBlue(),
-                    color.getAlpha(),
-                    index
-            };
-            values.add(element);
-        });
+    @Override
+    public int getRowCount() {
+        return colorPalette.getColorMapIndicies().length;
+    }
 
-        table = new JTable(values.toArray(new Integer[0][0]), TABLE_COLUMN_NAMES);
-        table.setFillsViewportHeight(true);
-        this.tableScroll.setViewportView(table);
-        this.numColors.setText(String.valueOf(this.colorPalette.getSize()));
+    @Override
+    public int getColumnCount() {
+        return TABLE_COLUMN_NAMES.length;
+    }
+
+    @Override
+    public String getColumnName(int columnIndex) {
+        return TABLE_COLUMN_NAMES[columnIndex];
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        return String.class;
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return true;
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        Map<Integer, Color> map = colorPalette.getColorMap();
+        Object key = map.keySet().toArray()[rowIndex];
+        if (columnIndex == TABLE_COLUMN_NAMES.length - 1) {
+            return key;
+        } else {
+            Color color = map.get(key);
+            switch (columnIndex) {
+                case 0:
+                    return color.getRed();
+                case 1:
+                    return color.getGreen();
+                case 2:
+                    return color.getBlue();
+                case 3:
+                    return color.getAlpha();
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        int newValue = 0;
+        try {
+            newValue = Integer.parseInt((String)aValue);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        Map<Integer, Color> map = colorPalette.getColorMap();
+        Integer key = (Integer) map.keySet().toArray()[rowIndex];
+        Color color = map.get(key);
+        int index = key;
+
+        if (columnIndex == TABLE_COLUMN_NAMES.length - 1) {
+            index = newValue;
+        } else {
+            switch (columnIndex) {
+                case 0:
+                    color = new Color(newValue, color.getGreen(), color.getBlue(), color.getAlpha());
+                    break;
+                case 1:
+                    color = new Color(color.getRed(), newValue, color.getBlue(), color.getAlpha());
+                    break;
+                case 2:
+                    color = new Color(color.getRed(), color.getGreen(), newValue, color.getAlpha());
+                    break;
+                case 3:
+                    color = new Color(color.getRed(), color.getGreen(), color.getBlue(), newValue);
+                    break;
+            }
+        }
+
+        colorPalette.removeColor(key);
+        colorPalette.addColor(color, index);
+    }
+
+    @Override
+    public void addTableModelListener(TableModelListener l) {
+    }
+
+    @Override
+    public void removeTableModelListener(TableModelListener l) {
     }
 
     @Override
