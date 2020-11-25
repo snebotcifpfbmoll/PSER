@@ -14,6 +14,8 @@ public class ControlPanel extends JPanel {
     public int height = 1;
     public ControlPanelDelegate delegate = null;
 
+    private static final int INSET_BIG = 10;
+    private static final int INSET_SMALL = 5;
     private static final int GRID_WIDTH = 3;
     private static final int SPARK_PERC_MIN = 0;
     private static final int SPARK_PERC_MAX = 100;
@@ -22,6 +24,8 @@ public class ControlPanel extends JPanel {
     private static final int TEMP_THRESH_MAX = 255;
     private static final int TEMP_THRESH_INIT = 128;
 
+    private static final ArrayList<ConvolutionData> CONVOLUTION_MATRIX_DATA = new ArrayList<>();
+    private static final GridBagConstraints SEPARATOR_CONSTRAINTS = new GridBagConstraints();
     private static final FlameData DEFAULT_FLAME_DATA = new FlameData();
     static {
         final ColorPalette cp = new ColorPalette(256);
@@ -32,19 +36,6 @@ public class ControlPanel extends JPanel {
         cp.addColor(new Color(80, 110, 190, 192), 220);
         cp.addColor(new Color(90, 165, 235, 128), 240);
         cp.addColor(new Color(255, 255, 255, 255), 255);
-        /*
-        cp.addColor(new Color(0, 0, 0, 0), 0);
-        cp.addColor(new Color(255, 0, 0, 128), 32);
-        cp.addColor(new Color(255, 0, 0, 255), 100);
-        cp.addColor(new Color(255, 165, 0, 255), 128);
-        cp.addColor(new Color(255, 255, 0, 255), 255);
-        cp.addColor(new Color(255, 50, 50, 64), 64);
-        cp.addColor(new Color(255, 255, 120, 255), 80);
-        cp.addColor(new Color(240, 115, 120, 255), 100);
-        cp.addColor(new Color(80, 110, 190, 192), 128);
-        cp.addColor(new Color(90, 165, 235, 128), 165);
-        cp.addColor(new Color(255, 255, 255, 255), 255);
-        * */
         DEFAULT_FLAME_DATA.colorPalette = cp;
         DEFAULT_FLAME_DATA.sparkPercentage = SPARK_PERC_INIT;
         DEFAULT_FLAME_DATA.mult_left = 1.2D;
@@ -55,9 +46,24 @@ public class ControlPanel extends JPanel {
         DEFAULT_FLAME_DATA.mult_bottom_right = 0.7D;
         DEFAULT_FLAME_DATA.divisor = 6.009D;
         DEFAULT_FLAME_DATA.constant = 0.4D;
+
+        // Convolution Matrix Data
+        CONVOLUTION_MATRIX_DATA.add(new ConvolutionData("None", new int[][]{{0, 0, 0}, {0, 1, 0}, {0, 0, 0}}, 1));
+        CONVOLUTION_MATRIX_DATA.add(new ConvolutionData("Sharpen", new int[][]{{0, -1, 0}, {-1, 5, -1}, {0, -1, 0}}, 1));
+        CONVOLUTION_MATRIX_DATA.add(new ConvolutionData("Blur", new int[][]{{1, 1, 1}, {1, 1, 1}, {1, 1, 1}}, 9));
+        CONVOLUTION_MATRIX_DATA.add(new ConvolutionData("Edge detection", new int[][]{{0, 1, 0}, {1, -4, 1}, {0, 1, 0}}, 1));
+
+        // Separator constraints
+        SEPARATOR_CONSTRAINTS.gridx = 0;
+        SEPARATOR_CONSTRAINTS.gridy = 0;
+        SEPARATOR_CONSTRAINTS.gridwidth = GRID_WIDTH;
+        SEPARATOR_CONSTRAINTS.gridheight = 1;
+        SEPARATOR_CONSTRAINTS.weightx = 1;
+        SEPARATOR_CONSTRAINTS.insets = new Insets(0, INSET_BIG, INSET_BIG, INSET_BIG);
     }
 
     // UI
+    private static final Font TITLE_FONT = new Font("", Font.PLAIN, 20);
     private final JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home"));
     private ColorPaletteView paletteView = null;
     private final JSlider sparkPercentage = new JSlider(SPARK_PERC_MIN, SPARK_PERC_MAX, DEFAULT_FLAME_DATA.sparkPercentage);
@@ -65,7 +71,6 @@ public class ControlPanel extends JPanel {
     private final FireMultipliersView fireMult = new FireMultipliersView();
     private final JTextField divisorText = new JTextField(String.valueOf(DEFAULT_FLAME_DATA.divisor));
     private final JTextField constantText = new JTextField(String.valueOf(DEFAULT_FLAME_DATA.constant));
-    private final ArrayList<ConvolutionData> convolutionMatrixData = new ArrayList<>();
     private final JComboBox<String> comboBox = new JComboBox<>();
     private final ConvolutionMatrixView matrixView = new ConvolutionMatrixView();
     private final JTextField kTextField = new JTextField("1");
@@ -98,14 +103,16 @@ public class ControlPanel extends JPanel {
         // File chooser
         JLabel fileLabel = new JLabel("Source file");
         fileLabel.setVerticalAlignment(JLabel.CENTER);
+        fileLabel.setFont(TITLE_FONT);
         constraints.gridx = 0;
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH;
         constraints.gridheight = 1;
-        constraints.insets = new Insets(5, 10, 5, 10);
+        constraints.insets = new Insets(INSET_SMALL, INSET_BIG, INSET_SMALL, INSET_BIG);
         panel.add(fileLabel, constraints);
 
         ylevel += constraints.gridheight;
+        addSeparator(panel, ylevel++);
 
         JTextArea filePath = new JTextArea();
         filePath.setLineWrap(true);
@@ -125,10 +132,24 @@ public class ControlPanel extends JPanel {
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH;
         constraints.gridheight = constraints.gridwidth;
-        constraints.insets = new Insets(0, 5, 0, 5);
+        constraints.insets = new Insets(0, INSET_SMALL, 0, INSET_SMALL);
         panel.add(fileChooser, constraints);
 
         ylevel += constraints.gridheight;
+
+        // Fire settings
+        JLabel fireSettingsLabel = new JLabel("Fire settings");
+        fireSettingsLabel.setVerticalAlignment(JLabel.CENTER);
+        fireSettingsLabel.setFont(TITLE_FONT);
+        constraints.gridx = 0;
+        constraints.gridy = ylevel;
+        constraints.gridwidth = GRID_WIDTH;
+        constraints.gridheight = 1;
+        constraints.insets = new Insets(0, INSET_BIG, 0, 0);
+        panel.add(fireSettingsLabel, constraints);
+
+        ylevel += constraints.gridheight;
+        addSeparator(panel, ylevel++);
 
         // Color palette
         JLabel colorPaletteLabel = new JLabel("Color Palette");
@@ -137,7 +158,7 @@ public class ControlPanel extends JPanel {
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH;
         constraints.gridheight = 1;
-        constraints.insets = new Insets(5, 10, 5, 10);
+        constraints.insets = new Insets(INSET_SMALL, INSET_BIG, INSET_SMALL, INSET_BIG);
         panel.add(colorPaletteLabel, constraints);
 
         ylevel += constraints.gridheight;
@@ -146,21 +167,21 @@ public class ControlPanel extends JPanel {
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH;
         constraints.gridheight = 6;
-        constraints.insets = new Insets(0, 0, 0, 0);
+        constraints.insets = new Insets(0, 0, INSET_BIG, 0);
         this.paletteView = new ColorPaletteView(this.width, this.width / 2, DEFAULT_FLAME_DATA.colorPalette);
         panel.add(paletteView, constraints);
 
         ylevel += constraints.gridheight;
 
         // Spark percentage
-        JLabel fireLabel = new JLabel("Spark percentage");
-        fireLabel.setVerticalAlignment(JLabel.CENTER);
+        JLabel fireSettingsSetup = new JLabel("Spark percentage");
+        fireSettingsSetup.setVerticalAlignment(JLabel.CENTER);
         constraints.gridx = 0;
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH;
         constraints.gridheight = 1;
-        constraints.insets = new Insets(5, 10, 5, 10);
-        panel.add(fireLabel, constraints);
+        constraints.insets = new Insets(INSET_SMALL, INSET_BIG, INSET_SMALL, INSET_BIG);
+        panel.add(fireSettingsSetup, constraints);
 
         ylevel += constraints.gridheight;
 
@@ -169,11 +190,11 @@ public class ControlPanel extends JPanel {
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH - 1;
         constraints.gridheight = 1;
-        constraints.insets = new Insets(0, 0, 5, 0);
+        constraints.insets = new Insets(0, 0, INSET_SMALL, 0);
         panel.add(sparkPercentage, constraints);
 
         JLabel sparkPercentageLabel = new JLabel(SPARK_PERC_INIT + "%");
-        fireLabel.setVerticalAlignment(JLabel.CENTER);
+        fireSettingsSetup.setVerticalAlignment(JLabel.CENTER);
         constraints.gridx = constraints.gridwidth;
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH - constraints.gridwidth;
@@ -193,7 +214,7 @@ public class ControlPanel extends JPanel {
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH;
         constraints.gridheight = 1;
-        constraints.insets = new Insets(5, 10, 5, 10);
+        constraints.insets = new Insets(INSET_SMALL, INSET_BIG, INSET_SMALL, INSET_BIG);
         panel.add(tempLabel, constraints);
 
         ylevel += constraints.gridheight;
@@ -202,7 +223,7 @@ public class ControlPanel extends JPanel {
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH - 1;
         constraints.gridheight = 1;
-        constraints.insets = new Insets(0, 0, 5, 0);
+        constraints.insets = new Insets(0, 0, INSET_SMALL, 0);
         panel.add(temperatureThreshold, constraints);
 
         JLabel tempThresholdLabel = new JLabel(String.valueOf(TEMP_THRESH_INIT));
@@ -225,7 +246,7 @@ public class ControlPanel extends JPanel {
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH - 1;
         constraints.gridheight = constraints.gridwidth;
-        constraints.insets = new Insets(5, 10, 5, 10);
+        constraints.insets = new Insets(INSET_SMALL, INSET_BIG, INSET_SMALL, INSET_BIG);
         panel.add(fireMult, constraints);
 
         ylevel += constraints.gridheight;
@@ -269,34 +290,41 @@ public class ControlPanel extends JPanel {
         ylevel += constraints.gridheight;
 
         /* Convoluiton */
-        // Convolution Title
-        JLabel convolutionTitle = new JLabel("Convolution: ");
-        convolutionTitle.setHorizontalAlignment(JLabel.RIGHT);
+        JLabel convolutionTitle = new JLabel("Convolution settings");
         convolutionTitle.setVerticalAlignment(JLabel.CENTER);
+        convolutionTitle.setFont(TITLE_FONT);
+        constraints.gridx = 0;
+        constraints.gridy = ylevel;
+        constraints.gridwidth = GRID_WIDTH;
+        constraints.gridheight = 1;
+        constraints.insets = new Insets(INSET_BIG, INSET_BIG, 0, 0);
+        panel.add(convolutionTitle, constraints);
+
+        ylevel += constraints.gridheight;
+        addSeparator(panel, ylevel++);
+
+        // Convolution Title
+        JLabel convolutionLabel = new JLabel("Convolution: ");
+        convolutionLabel.setHorizontalAlignment(JLabel.RIGHT);
+        convolutionLabel.setVerticalAlignment(JLabel.CENTER);
         constraints.gridx = 0;
         constraints.gridy = ylevel;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
-        constraints.insets = new Insets(5, 10, 5, 0);
-        panel.add(convolutionTitle, constraints);
+        constraints.insets = new Insets(INSET_SMALL, INSET_BIG, INSET_SMALL, INSET_BIG);
+        panel.add(convolutionLabel, constraints);
 
         ylevel += constraints.gridheight;
 
-        // Convolution Matrix Data
-        convolutionMatrixData.add(new ConvolutionData("None", new int[][]{{0, 0, 0}, {0, 1, 0}, {0, 0, 0}}, 1));
-        convolutionMatrixData.add(new ConvolutionData("Sharpen", new int[][]{{0, -1, 0}, {-1, 5, -1}, {0, -1, 0}}, 1));
-        convolutionMatrixData.add(new ConvolutionData("Blur", new int[][]{{1, 1, 1}, {1, 1, 1}, {1, 1, 1}}, 9));
-        convolutionMatrixData.add(new ConvolutionData("Edge detection", new int[][]{{0, 1, 0}, {1, -4, 1}, {0, 1, 0}}, 1));
-
         // Convolution Combo Box
-        for (ConvolutionData data : convolutionMatrixData) comboBox.addItem(data.name);
+        for (ConvolutionData data : CONVOLUTION_MATRIX_DATA) comboBox.addItem(data.name);
         comboBox.addActionListener(actionEvent -> {
             didSelectConvolution();
         });
         constraints.gridx = 1;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
-        constraints.insets = new Insets(5, 0, 5, 10);
+        constraints.insets = new Insets(INSET_SMALL, 0, INSET_SMALL, INSET_BIG);
         panel.add(comboBox, constraints);
 
         // Convolution Matrix View
@@ -304,9 +332,7 @@ public class ControlPanel extends JPanel {
         constraints.gridy = ylevel;
         constraints.gridwidth = GRID_WIDTH - 1;
         constraints.gridheight = constraints.gridwidth;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.CENTER;
-        constraints.insets = new Insets(5, 10, 5, 10);
+        constraints.insets = new Insets(INSET_SMALL, INSET_BIG, INSET_SMALL, INSET_BIG);
         panel.add(matrixView, constraints);
 
         ylevel += constraints.gridheight;
@@ -318,7 +344,7 @@ public class ControlPanel extends JPanel {
         constraints.gridy = ylevel;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
-        constraints.insets = new Insets(5, 0, 5, 0);
+        constraints.insets = new Insets(INSET_SMALL, 0, INSET_SMALL, 0);
         panel.add(kLabel, constraints);
 
         // K Text
@@ -326,7 +352,7 @@ public class ControlPanel extends JPanel {
         constraints.gridx = 1;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
-        constraints.insets = new Insets(5, 0, 5, 10);
+        constraints.insets = new Insets(INSET_SMALL, 0, INSET_SMALL, INSET_BIG);
         panel.add(kTextField, constraints);
 
         ylevel += constraints.gridheight;
@@ -343,20 +369,17 @@ public class ControlPanel extends JPanel {
             didPressApplyButton();
         });
 
-        ylevel += constraints.gridheight;
-
         // Scroll pane
         JScrollPane scroll = new JScrollPane(panel);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scroll.setMinimumSize(new Dimension(width + 20, height));
+        scroll.setMinimumSize(scroll.getPreferredSize());
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
-        constraints.anchor = GridBagConstraints.CENTER;
         constraints.fill = GridBagConstraints.BOTH;
         constraints.ipadx = 0;
         constraints.ipady = 0;
@@ -365,6 +388,15 @@ public class ControlPanel extends JPanel {
 
         // Post UI setup
         comboBox.setSelectedIndex(0);
+    }
+
+    private void addSeparator(JPanel panel, int ylevel) {
+        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+        separator.setPreferredSize(new Dimension(this.width, 10));
+        separator.setMinimumSize(separator.getPreferredSize());
+
+        SEPARATOR_CONSTRAINTS.gridy = ylevel;
+        panel.add(separator, SEPARATOR_CONSTRAINTS);
     }
 
     public ConvolutionData getConvolutionData() {
@@ -386,8 +418,8 @@ public class ControlPanel extends JPanel {
 
     public void didSelectConvolution() {
         int index = comboBox.getSelectedIndex();
-        if (index >= convolutionMatrixData.size() || matrixView == null || kTextField == null) return;
-        ConvolutionData data = convolutionMatrixData.get(index);
+        if (index >= CONVOLUTION_MATRIX_DATA.size() || matrixView == null || kTextField == null) return;
+        ConvolutionData data = CONVOLUTION_MATRIX_DATA.get(index);
         matrixView.setMatrix(data.matrix);
         kTextField.setText(String.valueOf(data.k));
     }

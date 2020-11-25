@@ -19,7 +19,6 @@ public class ImageEditor extends JFrame implements ControlPanelDelegate {
 
     // UI
     private ImageViewer imageViewer = null;
-    private Thread imageViewerThread = null;
 
     public ImageEditor() {
         super();
@@ -32,7 +31,7 @@ public class ImageEditor extends JFrame implements ControlPanelDelegate {
         constraints.anchor = GridBagConstraints.CENTER;
         constraints.fill = GridBagConstraints.BOTH;
 
-        ControlPanel controlPanel = new ControlPanel(WINDOW_WIDTH / 4, (int) (WINDOW_HEIGHT * 1.5));
+        ControlPanel controlPanel = new ControlPanel(WINDOW_WIDTH / 4, (int) (WINDOW_HEIGHT * 2));
         controlPanel.delegate = this;
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -57,7 +56,7 @@ public class ImageEditor extends JFrame implements ControlPanelDelegate {
         try {
             BufferedImage image = ImageIO.read(file);
             imageViewer.process(image, convolutionData, flameData);
-            imageViewerThread = new Thread(imageViewer);
+            Thread imageViewerThread = new Thread(imageViewer);
             imageViewerThread.start();
         } catch (Exception e) {
             System.out.println("main - Error: " + e.getMessage() + e.getClass());
@@ -66,7 +65,8 @@ public class ImageEditor extends JFrame implements ControlPanelDelegate {
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT);
+        //return new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT);
+        return super.getPreferredSize();
     }
 
     public static void main(String[] args) {
