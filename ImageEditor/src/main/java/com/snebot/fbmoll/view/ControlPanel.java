@@ -24,6 +24,21 @@ public class ControlPanel extends JPanel {
     private static final int TEMP_THRESH_MAX = 255;
     private static final int TEMP_THRESH_INIT = 128;
 
+    private static final String EMPTY = "";
+    private static final String PERCENTAGE = "%";
+    private static final String SOURCE_FILE_TITLE = "Source file";
+    private static final String FIRE_SETTINGS_TITLE = "Fire settings";
+    private static final String COLOR_PALETTE_TITLE = "Color palette";
+    private static final String SPARK_PERCENTAGE_TITLE = "Spark percentage";
+    private static final String TEMP_THRESHOLD_TITLE = "Temperature threshold";
+    private static final String FIRE_MULT_TITLE = "Fire multipliers";
+    private static final String DIVISOR_TITLE = "Divisor: ";
+    private static final String CONSTANT_TITLE = "Constant: ";
+    private static final String CONVOLUTION_SETTINGS_TITLE = "Convolution settings";
+    private static final String CONVOLUTION_TITLE = "Convolution: ";
+    private static final String K_TITLE = "K: ";
+    private static final String APPLY_BUTTON_TITLE = "Apply";
+
     private static final ArrayList<ConvolutionData> CONVOLUTION_MATRIX_DATA = new ArrayList<>();
     private static final GridBagConstraints DEFAULT_CONSTRAINTS = new GridBagConstraints();
     private static final GridBagConstraints SEPARATOR_CONSTRAINTS = new GridBagConstraints();
@@ -70,7 +85,7 @@ public class ControlPanel extends JPanel {
     }
 
     // UI
-    private static final Font TITLE_FONT = new Font("", Font.PLAIN, 20);
+    private static final Font TITLE_FONT = new Font(EMPTY, Font.PLAIN, 20);
     private final JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home"));
     private ColorPaletteView paletteView = null;
     private final JSlider sparkPercentage = new JSlider(SPARK_PERC_MIN, SPARK_PERC_MAX, DEFAULT_FLAME_DATA.sparkPercentage);
@@ -103,7 +118,7 @@ public class ControlPanel extends JPanel {
         GridBagConstraints constraints = DEFAULT_CONSTRAINTS;
 
         // Apply Button
-        JButton applyButton = new JButton("Apply");
+        JButton applyButton = new JButton(APPLY_BUTTON_TITLE);
         constraints.gridx = 0;
         constraints.gridy = ylevel;
         constraints.gridwidth = 1;
@@ -136,7 +151,7 @@ public class ControlPanel extends JPanel {
     private int addSourceFile(JPanel panel, int ylevel) {
         GridBagConstraints constraints = DEFAULT_CONSTRAINTS;
 
-        JLabel fileLabel = new JLabel("Source file");
+        JLabel fileLabel = new JLabel(SOURCE_FILE_TITLE);
         fileLabel.setVerticalAlignment(JLabel.CENTER);
         fileLabel.setFont(TITLE_FONT);
         constraints.gridx = 0;
@@ -178,7 +193,7 @@ public class ControlPanel extends JPanel {
         GridBagConstraints constraints = DEFAULT_CONSTRAINTS;
 
         // Fire settings
-        JLabel fireSettingsLabel = new JLabel("Fire settings");
+        JLabel fireSettingsLabel = new JLabel(FIRE_SETTINGS_TITLE);
         fireSettingsLabel.setVerticalAlignment(JLabel.CENTER);
         fireSettingsLabel.setFont(TITLE_FONT);
         constraints.gridx = 0;
@@ -192,7 +207,7 @@ public class ControlPanel extends JPanel {
         addSeparator(panel, ylevel++);
 
         // Color palette
-        JLabel colorPaletteLabel = new JLabel("Color Palette");
+        JLabel colorPaletteLabel = new JLabel(COLOR_PALETTE_TITLE);
         colorPaletteLabel.setVerticalAlignment(JLabel.CENTER);
         constraints.gridx = 0;
         constraints.gridy = ylevel;
@@ -214,7 +229,7 @@ public class ControlPanel extends JPanel {
         ylevel += constraints.gridheight;
 
         // Spark percentage
-        JLabel fireSettingsSetup = new JLabel("Spark percentage");
+        JLabel fireSettingsSetup = new JLabel(SPARK_PERCENTAGE_TITLE);
         fireSettingsSetup.setVerticalAlignment(JLabel.CENTER);
         constraints.gridx = 0;
         constraints.gridy = ylevel;
@@ -233,7 +248,7 @@ public class ControlPanel extends JPanel {
         constraints.insets = new Insets(0, 0, INSET_SMALL, 0);
         panel.add(sparkPercentage, constraints);
 
-        JLabel sparkPercentageLabel = new JLabel(SPARK_PERC_INIT + "%");
+        JLabel sparkPercentageLabel = new JLabel(SPARK_PERC_INIT + PERCENTAGE);
         fireSettingsSetup.setVerticalAlignment(JLabel.CENTER);
         constraints.gridx = constraints.gridwidth;
         constraints.gridy = ylevel;
@@ -241,12 +256,12 @@ public class ControlPanel extends JPanel {
         constraints.gridheight = 1;
         panel.add(sparkPercentageLabel, constraints);
 
-        sparkPercentage.addChangeListener(e -> sparkPercentageLabel.setText(sparkPercentage.getValue() + "%"));
+        sparkPercentage.addChangeListener(e -> sparkPercentageLabel.setText(sparkPercentage.getValue() + PERCENTAGE));
 
         ylevel += constraints.gridheight;
 
         // Temperature threshold
-        JLabel tempLabel = new JLabel("Temperature threshold");
+        JLabel tempLabel = new JLabel(TEMP_THRESHOLD_TITLE);
         tempLabel.setVerticalAlignment(JLabel.CENTER);
         constraints.gridx = 0;
         constraints.gridy = ylevel;
@@ -277,7 +292,7 @@ public class ControlPanel extends JPanel {
         ylevel += constraints.gridheight;
 
         // Fire multipliers
-        JLabel fireMultipliers = new JLabel("Fire multipliers");
+        JLabel fireMultipliers = new JLabel(FIRE_MULT_TITLE);
         fireMultipliers.setVerticalAlignment(JLabel.CENTER);
         constraints.gridx = 0;
         constraints.gridy = ylevel;
@@ -299,7 +314,7 @@ public class ControlPanel extends JPanel {
         ylevel += constraints.gridheight;
 
         // Divisor
-        JLabel divisorLabel = new JLabel("Divisor: ");
+        JLabel divisorLabel = new JLabel(DIVISOR_TITLE);
         divisorLabel.setHorizontalAlignment(JLabel.RIGHT);
         divisorLabel.setVerticalAlignment(JLabel.CENTER);
         constraints.gridx = 0;
@@ -318,7 +333,7 @@ public class ControlPanel extends JPanel {
         ylevel += constraints.gridheight;
 
         // Constant
-        JLabel constantLabel = new JLabel("Constant: ");
+        JLabel constantLabel = new JLabel(CONSTANT_TITLE);
         constantLabel.setHorizontalAlignment(JLabel.RIGHT);
         constantLabel.setVerticalAlignment(JLabel.CENTER);
         constraints.gridx = 0;
@@ -342,7 +357,7 @@ public class ControlPanel extends JPanel {
         GridBagConstraints constraints = DEFAULT_CONSTRAINTS;
 
         /* Convoluiton */
-        JLabel convolutionTitle = new JLabel("Convolution settings");
+        JLabel convolutionTitle = new JLabel(CONVOLUTION_SETTINGS_TITLE);
         convolutionTitle.setVerticalAlignment(JLabel.CENTER);
         convolutionTitle.setFont(TITLE_FONT);
         constraints.gridx = 0;
@@ -356,7 +371,7 @@ public class ControlPanel extends JPanel {
         addSeparator(panel, ylevel++);
 
         // Convolution Title
-        JLabel convolutionLabel = new JLabel("Convolution: ");
+        JLabel convolutionLabel = new JLabel(CONVOLUTION_TITLE);
         convolutionLabel.setHorizontalAlignment(JLabel.RIGHT);
         convolutionLabel.setVerticalAlignment(JLabel.CENTER);
         constraints.gridx = 0;
@@ -388,7 +403,7 @@ public class ControlPanel extends JPanel {
         ylevel += constraints.gridheight;
 
         // K Label
-        JLabel kLabel = new JLabel("K: ");
+        JLabel kLabel = new JLabel(K_TITLE);
         kLabel.setHorizontalAlignment(JLabel.RIGHT);
         kLabel.setVerticalAlignment(JLabel.CENTER);
         constraints.gridy = ylevel;
@@ -424,10 +439,10 @@ public class ControlPanel extends JPanel {
             if (matrixView != null && kTextField != null) {
                 int k = Integer.parseInt(kTextField.getText());
                 if (k == 0) {
-                    kTextField.setText("1");
                     k = 1;
+                    kTextField.setText(String.valueOf(k));
                 }
-                data = new ConvolutionData("", matrixView.getMatrix(), k);
+                data = new ConvolutionData(EMPTY, matrixView.getMatrix(), k);
             }
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -454,8 +469,8 @@ public class ControlPanel extends JPanel {
         try {
             flameData.divisor = Double.parseDouble(divisorText.getText());
             if (flameData.divisor == 0.0D) {
-                divisorText.setText("1.0");
                 flameData.divisor = 1.0;
+                divisorText.setText(String.valueOf(flameData.divisor));
             }
             flameData.constant = Double.parseDouble(constantText.getText());
         } catch (Exception e) {
