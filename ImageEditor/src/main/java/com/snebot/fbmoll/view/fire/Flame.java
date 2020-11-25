@@ -12,7 +12,7 @@ public class Flame extends BufferedImage implements Runnable {
     private int[] buffer;
     private ArrayList<Integer[]> map;
     public FlameData flameData;
-    public int delay = 5;
+    public int delay = 8;
     public boolean animate = false;
 
     public int getWidth() {
@@ -90,23 +90,6 @@ public class Flame extends BufferedImage implements Runnable {
         System.arraycopy(res, 0, buffer, 0, buffer.length);
     }
 
-    private Image processImage() {
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
-        ColorPalette palette = flameData.colorPalette;
-        int[] buffer = getBuffer();
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (y == height - 1) continue;
-                int index = y * width + x;
-                Color color = palette.getColor(buffer[index]);
-                image.setRGB(x, y, color.getRGB());
-            }
-        }
-
-        return image;
-    }
-
     private void processFrame() {
         ColorPalette palette = flameData.colorPalette;
         int[] buffer = getBuffer();
@@ -119,13 +102,6 @@ public class Flame extends BufferedImage implements Runnable {
                 this.setRGB(x, y, color.getRGB());
             }
         }
-    }
-
-    public Image processImage2() {
-        this.coolSparks();
-        this.addSparks();
-        this.processBuffer();
-        return this.processImage();
     }
 
     private void process() {
@@ -143,6 +119,7 @@ public class Flame extends BufferedImage implements Runnable {
             try {
                 Thread.sleep(this.delay);
             } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
         }
     }

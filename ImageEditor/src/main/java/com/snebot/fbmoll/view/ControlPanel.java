@@ -27,11 +27,24 @@ public class ControlPanel extends JPanel {
         final ColorPalette cp = new ColorPalette(256);
         cp.addColor(new Color(0, 0, 0, 0), 0);
         cp.addColor(new Color(255, 50, 50, 64), 64);
+        cp.addColor(new Color(255, 255, 120, 255), 120);
+        cp.addColor(new Color(240, 115, 120, 255), 160);
+        cp.addColor(new Color(80, 110, 190, 192), 220);
+        cp.addColor(new Color(90, 165, 235, 128), 240);
+        cp.addColor(new Color(255, 255, 255, 255), 255);
+        /*
+        cp.addColor(new Color(0, 0, 0, 0), 0);
+        cp.addColor(new Color(255, 0, 0, 128), 32);
+        cp.addColor(new Color(255, 0, 0, 255), 100);
+        cp.addColor(new Color(255, 165, 0, 255), 128);
+        cp.addColor(new Color(255, 255, 0, 255), 255);
+        cp.addColor(new Color(255, 50, 50, 64), 64);
         cp.addColor(new Color(255, 255, 120, 255), 80);
         cp.addColor(new Color(240, 115, 120, 255), 100);
         cp.addColor(new Color(80, 110, 190, 192), 128);
         cp.addColor(new Color(90, 165, 235, 128), 165);
         cp.addColor(new Color(255, 255, 255, 255), 255);
+        * */
         cp.generatePalette();
         DEFAULT_FLAME_DATA.colorPalette = cp;
         DEFAULT_FLAME_DATA.sparkPercentage = SPARK_PERC_INIT;
@@ -41,7 +54,7 @@ public class ControlPanel extends JPanel {
         DEFAULT_FLAME_DATA.mult_bottom_left = 0.7D;
         DEFAULT_FLAME_DATA.mult_bottom = 0.738D;
         DEFAULT_FLAME_DATA.mult_bottom_right = 0.7D;
-        DEFAULT_FLAME_DATA.divisor = 5.999D;
+        DEFAULT_FLAME_DATA.divisor = 6.009D;
         DEFAULT_FLAME_DATA.constant = 0.4D;
     }
 

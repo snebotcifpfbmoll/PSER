@@ -15,25 +15,16 @@ import java.util.ArrayList;
 public class ImageViewer extends Canvas implements Runnable {
     private int width = 1;
     private int height = 1;
-    private int delay = 10;
-    private boolean animate = true;
     private Timer timer = null;
+    public int delay = 10;
 
     private boolean update = true;
     private Thread flameThread = null;
-    private Image original = null;
     private Image sourceImage = null;
     private Image convolutionImage = null;
     private Image resultImage = null;
+    private Image fireImage = null;
     private Flame flame = null;
-
-    public int getDelay() {
-        return delay;
-    }
-
-    public void setDelay(int delay) {
-        this.delay = delay;
-    }
 
     public ImageViewer() {
         super();
@@ -51,7 +42,6 @@ public class ImageViewer extends Canvas implements Runnable {
     public byte[] convolution(byte[] src, int width, int height, int pro, int startX, int startY, int endX, int endY, int[][] conv, int K) {
         if (conv.length != conv[0].length) return null;
         byte[] ret = new byte[src.length];
-        //byte[] ret = src.clone();
 
         int conv_diff = conv.length / 2;
         if (startX < conv_diff) startX = conv_diff;
@@ -167,7 +157,6 @@ public class ImageViewer extends Canvas implements Runnable {
         double ratio = (double) image.getWidth() / image.getHeight();
         int newHeight = (int) (targetWidth / ratio);
         int newWidth = (int) (newHeight * ratio);
-        this.original = image;
         this.sourceImage = resize(image, newWidth, newHeight);
 
         Image convolutionImage = convolution(image, data.matrix, data.k);
@@ -177,7 +166,13 @@ public class ImageViewer extends Canvas implements Runnable {
         Image resultImage = createImageFromTempMap(convolutionImage.getWidth(null), convolutionImage.getHeight(null), map);
         this.resultImage = resize(resultImage, newWidth, newHeight);
 
-        map = testMap(resultImage.getWidth(null), resultImage.getHeight(null));
+        /*map = testMap(200, 200);
+        int y = this.sourceImage.getHeight(null);
+        this.fireImage = resize(image, this.width, this.height - y);
+        this.flame = new Flame(200, 200, flameData, map);*/
+        //map = testMap(resultImage.getWidth(null), resultImage.getHeight(null));
+        int y = this.sourceImage.getHeight(null);
+        this.fireImage = resize(image, this.width, this.height - y);
         this.flame = new Flame(resultImage.getWidth(null), resultImage.getHeight(null), flameData, map);
         this.update = true;
     }
@@ -200,31 +195,30 @@ public class ImageViewer extends Canvas implements Runnable {
             }
             update = false;
         }
-        if (flame != null && original != null) {
+        if (this.flame != null && this.fireImage != null) {
             int y = sourceImage.getHeight(null);
+            Image flameImage = resize(flame, width, height - y);
             g.clearRect(0, y, width, height - y);
-            //g.drawImage(this.original, 0, y, null);
-            g.drawImage(flame, 0, y, null);
+            g.drawImage(this.fireImage, 0, y, null);
+            g.drawImage(flameImage, 0, y, null);
         }
     }
 
     @Override
     public void run() {
-        if (flame != null) {
+        if (this.flame != null) {
+            if (this.flameThread != null && this.flameThread.isAlive()) {
+                this.flame.animate = false;
+                try {
+                    this.flameThread.join(1000);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
             this.flameThread = new Thread(flame);
             this.flameThread.start();
         }
         if (timer != null) timer.start();
-        /*this.animate = true;
-        while (this.animate) {
-            this.paint();
-            try {
-                Thread.sleep(this.delay);
-            } catch (Exception e) {
-                System.out.println("ImageViewer - Error: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }*/
     }
 
     @Override
