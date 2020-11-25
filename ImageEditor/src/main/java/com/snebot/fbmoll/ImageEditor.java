@@ -13,7 +13,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class ImageEditor extends JFrame implements ControlPanelDelegate {
-    private static final String TEST_PATH = "/Users/hystrix/Development/DAM/PSER/image-editor/src/main/resources/image-1920x1080-4.jpg";
     private static final int WINDOW_WIDTH = 1400;
     private static final int WINDOW_HEIGHT = 850;
 
@@ -31,7 +30,7 @@ public class ImageEditor extends JFrame implements ControlPanelDelegate {
         constraints.anchor = GridBagConstraints.CENTER;
         constraints.fill = GridBagConstraints.BOTH;
 
-        ControlPanel controlPanel = new ControlPanel(WINDOW_WIDTH / 4, (int) (WINDOW_HEIGHT * 2));
+        ControlPanel controlPanel = new ControlPanel(WINDOW_WIDTH / 4, 1250);
         controlPanel.delegate = this;
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -59,13 +58,12 @@ public class ImageEditor extends JFrame implements ControlPanelDelegate {
             Thread imageViewerThread = new Thread(imageViewer);
             imageViewerThread.start();
         } catch (Exception e) {
-            System.out.println("main - Error: " + e.getMessage() + e.getClass());
+            System.out.println(e.getMessage());
         }
     }
 
     @Override
     public Dimension getPreferredSize() {
-        //return new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT);
         return super.getPreferredSize();
     }
 
