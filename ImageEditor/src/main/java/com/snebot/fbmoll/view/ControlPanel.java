@@ -38,6 +38,7 @@ public class ControlPanel extends JPanel {
     private static final String CONVOLUTION_TITLE = "Convolution: ";
     private static final String K_TITLE = "K: ";
     private static final String APPLY_BUTTON_TITLE = "Apply";
+    private static final int K_DEFAULT_VALUE = 1;
 
     private static final ArrayList<ConvolutionData> CONVOLUTION_MATRIX_DATA = new ArrayList<>();
     private static final GridBagConstraints DEFAULT_CONSTRAINTS = new GridBagConstraints();
@@ -95,7 +96,7 @@ public class ControlPanel extends JPanel {
     private final JTextField constantText = new JTextField(String.valueOf(DEFAULT_FLAME_DATA.constant));
     private final JComboBox<String> comboBox = new JComboBox<>();
     private final ConvolutionMatrixView matrixView = new ConvolutionMatrixView();
-    private final JTextField kTextField = new JTextField("1");
+    private final JTextField kTextField = new JTextField(String.valueOf(K_DEFAULT_VALUE));
 
     public ControlPanel(int width, int height) {
         super();
@@ -439,13 +440,13 @@ public class ControlPanel extends JPanel {
             if (matrixView != null && kTextField != null) {
                 int k = Integer.parseInt(kTextField.getText());
                 if (k == 0) {
-                    k = 1;
+                    k = K_DEFAULT_VALUE;
                     kTextField.setText(String.valueOf(k));
                 }
                 data = new ConvolutionData(EMPTY, matrixView.getMatrix(), k);
             }
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
         return data;
     }
@@ -469,7 +470,7 @@ public class ControlPanel extends JPanel {
         try {
             flameData.divisor = Double.parseDouble(divisorText.getText());
             if (flameData.divisor == 0.0D) {
-                flameData.divisor = 1.0;
+                flameData.divisor = DEFAULT_FLAME_DATA.divisor;
                 divisorText.setText(String.valueOf(flameData.divisor));
             }
             flameData.constant = Double.parseDouble(constantText.getText());
