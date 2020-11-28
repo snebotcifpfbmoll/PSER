@@ -2,8 +2,10 @@ package com.snebot.fbmoll.view;
 
 import com.snebot.fbmoll.data.ConvolutionData;
 import com.snebot.fbmoll.data.FlameData;
+import com.snebot.fbmoll.util.ImageUtils;
 import com.snebot.fbmoll.view.fire.ColorPalette;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -23,6 +25,7 @@ public class ControlPanel extends JPanel {
     private static final int TEMP_THRESH_MIN = 0;
     private static final int TEMP_THRESH_MAX = 255;
     private static final int TEMP_THRESH_INIT = 128;
+    private static final int PREVIEW_IMAGE_SIZE = 80;
 
     private static final String EMPTY = "";
     private static final String PERCENTAGE = "%";
@@ -123,7 +126,6 @@ public class ControlPanel extends JPanel {
         JButton applyButton = new JButton(APPLY_BUTTON_TITLE);
         constraints.gridx = 0;
         constraints.gridy = ylevel;
-        constraints.gridwidth = 1;
         constraints.gridwidth = GRID_WIDTH - 1;
         panel.add(applyButton, constraints);
 
@@ -170,12 +172,37 @@ public class ControlPanel extends JPanel {
         filePath.setLineWrap(true);
         filePath.setWrapStyleWord(true);
         filePath.setEnabled(false);
+        constraints.weightx = 1;
+        constraints.weighty = 1;
+        constraints.fill = GridBagConstraints.BOTH;
         constraints.gridy = ylevel;
+        constraints.gridwidth = 2;
+        constraints.insets = new Insets(INSET_BIG, 0,INSET_BIG, 0);
         panel.add(filePath, constraints);
+
+        JLabel label = new JLabel();
+        label.setSize(PREVIEW_IMAGE_SIZE, PREVIEW_IMAGE_SIZE);
+        label.setPreferredSize(label.getSize());
+        label.setMinimumSize(label.getSize());
+        constraints.gridx = 2;
+        constraints.gridwidth = 1;
+        constraints.anchor = GridBagConstraints.LINE_END;
+        constraints.insets = new Insets(0, INSET_SMALL, INSET_BIG, INSET_BIG * 2);
+        panel.add(label, constraints);
+
+        ylevel += constraints.gridheight;
 
         fileChooser.addActionListener(e -> {
             File file = fileChooser.getSelectedFile();
             filePath.setText(file.getAbsolutePath());
+            ImageIcon icon = null;
+            try {
+                Image image = ImageUtils.resize(ImageIO.read(file), label.getSize().width, label.getSize().height);
+                icon = new ImageIcon(image);
+            } catch (Exception exception) {
+                System.out.println(exception.getMessage());
+            }
+            label.setIcon(icon);
         });
 
         ylevel += constraints.gridheight;
@@ -185,6 +212,7 @@ public class ControlPanel extends JPanel {
         constraints.gridwidth = GRID_WIDTH;
         constraints.gridheight = constraints.gridwidth;
         constraints.insets = new Insets(0, INSET_SMALL, 0, INSET_SMALL);
+        constraints.anchor = GridBagConstraints.CENTER;
         panel.add(fileChooser, constraints);
 
         ylevel += constraints.gridheight;

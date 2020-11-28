@@ -2,6 +2,7 @@ package com.snebot.fbmoll.view;
 
 import com.snebot.fbmoll.data.ConvolutionData;
 import com.snebot.fbmoll.data.FlameData;
+import com.snebot.fbmoll.util.ImageUtils;
 import com.snebot.fbmoll.view.fire.Flame;
 
 import javax.swing.*;
@@ -11,7 +12,6 @@ import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ImageViewer extends Canvas {
     private int width = 1;
@@ -39,7 +39,9 @@ public class ImageViewer extends Canvas {
         super();
         this.width = width;
         this.height = height;
-        timer = new Timer(this.delay, e -> { paint(); });
+        timer = new Timer(this.delay, e -> {
+            paint();
+        });
     }
 
     public byte[] convolution(byte[] src, int width, int height, int pro, int startX, int startY, int endX, int endY, int[][] conv, int K) {
@@ -139,35 +141,20 @@ public class ImageViewer extends Canvas {
         return image;
     }
 
-    private Dimension resize(int width, int height, int targetWidth, int targetHeight) {
-        double wRatio = (double) targetWidth / width;
-        double hRatio = (double) targetHeight / height;
-        double ratio = Math.min(wRatio, hRatio);
-        int newWidth = (int) (width * ratio);
-        int newHeight = (int) (height * ratio);
-        return new Dimension(newWidth, newHeight);
-    }
-
-    private Image resize(Image image, int width, int height) {
-        int imageWidth = image.getWidth(null);
-        int imageHeight = image.getHeight(null);
-        Dimension dimen = resize(imageWidth, imageHeight, width, height);
-        return image.getScaledInstance(dimen.width, dimen.height, Image.SCALE_DEFAULT);
-    }
-
     public void process(BufferedImage image, ConvolutionData data, FlameData flameData) {
+        this.stop();
         int targetWidth = this.width / 3;
         double ratio = (double) image.getWidth() / image.getHeight();
         int newHeight = (int) (targetWidth / ratio);
         int newWidth = (int) (newHeight * ratio);
-        this.sourceImage = resize(image, newWidth, newHeight);
+        this.sourceImage = ImageUtils.resize(image, newWidth, newHeight);
 
         Image convolutionImage = convolution(image, data.matrix, data.k);
-        this.convolutionImage = resize(convolutionImage, newWidth, newHeight);
+        this.convolutionImage = ImageUtils.resize(convolutionImage, newWidth, newHeight);
 
         ArrayList<Integer[]> map = createTemperatureMap(convolutionImage, data.temperatureThreshold);
         Image resultImage = createImageFromTempMap(convolutionImage.getWidth(null), convolutionImage.getHeight(null), map);
-        this.resultImage = resize(resultImage, newWidth, newHeight);
+        this.resultImage = ImageUtils.resize(resultImage, newWidth, newHeight);
 
         /*map = testMap(200, 200);
         int y = this.sourceImage.getHeight(null);
@@ -175,11 +162,10 @@ public class ImageViewer extends Canvas {
         this.flame = new Flame(200, 200, flameData, map);*/
         //map = testMap(resultImage.getWidth(null), resultImage.getHeight(null));
         int y = this.sourceImage.getHeight(null);
-        this.fireImage = resize(image, this.width, this.height - y);
+        this.fireImage = ImageUtils.resize(image, this.width, this.height - y);
         this.flame = new Flame(resultImage.getWidth(null), resultImage.getHeight(null), flameData, map);
         this.update = true;
 
-        this.stop();
         this.start();
     }
 
@@ -203,7 +189,7 @@ public class ImageViewer extends Canvas {
         }
         if (this.flame != null && this.fireImage != null) {
             int y = sourceImage.getHeight(null);
-            Image flameImage = resize(flame, width, height - y);
+            Image flameImage = ImageUtils.resize(flame, width, height - y);
             g.clearRect(0, y, width, height - y);
             g.drawImage(this.fireImage, 0, y, null);
             g.drawImage(flameImage, 0, y, null);
@@ -211,12 +197,12 @@ public class ImageViewer extends Canvas {
     }
 
     public void stop() {
-        if (flame != null) flame.interrupt();
+        if (flame != null) flame.stop();
         if (timer != null) timer.stop();
     }
 
     public void start() {
-        flame.start();
+        if (flame != null) flame.start();
         if (timer != null) timer.start();
     }
 

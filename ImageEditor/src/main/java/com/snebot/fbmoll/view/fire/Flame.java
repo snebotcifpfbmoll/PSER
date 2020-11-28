@@ -130,19 +130,13 @@ public class Flame extends BufferedImage implements Runnable {
     @Override
     public void run() {
         running = true;
-        while (running && !thread.isInterrupted()) {
+        while (running) {
             process();
             try {
                 Thread.sleep(this.delay);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.out.println("Flame thread was interrupted.");
             } catch (Exception e) {
                 System.out.println("Flame - " + e.getMessage());
             }
         }
-
-        Thread.currentThread().interrupt();
-        System.out.println("thread finishes");
     }
 }
