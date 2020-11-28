@@ -211,7 +211,7 @@ public class ImageViewer extends Canvas {
     }
 
     public void stop() {
-        if (flame != null) flame.stop();
+        if (flame != null) flame.interrupt();
         if (timer != null) timer.stop();
     }
 

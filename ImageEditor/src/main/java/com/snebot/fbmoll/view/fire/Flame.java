@@ -5,7 +5,6 @@ import com.snebot.fbmoll.data.FlameData;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Flame extends BufferedImage implements Runnable {
     private int width;
@@ -15,8 +14,8 @@ public class Flame extends BufferedImage implements Runnable {
     public FlameData flameData;
     public int delay = 8;
 
-    private Thread thread = null;
-    private final AtomicBoolean running = new AtomicBoolean(false);
+    private final Thread thread = new Thread(this, "Flame thread");
+    private volatile boolean running = false;
 
     public int getWidth() {
         return width;
@@ -102,7 +101,7 @@ public class Flame extends BufferedImage implements Runnable {
                 if (y == height - 1) continue;
                 int index = y * width + x;
                 Color color = palette.getColor(buffer[index]);
-                if (color == null) color = new Color(0, 0, 0,0);
+                if (color == null) color = new Color(0, 0, 0, 0);
                 this.setRGB(x, y, color.getRGB());
             }
         }
@@ -116,23 +115,22 @@ public class Flame extends BufferedImage implements Runnable {
     }
 
     public void start() {
-        if (thread == null) thread = new Thread(this);
         thread.start();
     }
 
     public void stop() {
-        running.set(false);
+        running = false;
     }
 
     public void interrupt() {
-        running.set(false);
-        if (thread != null) thread.interrupt();
+        running = false;
+        thread.interrupt();
     }
 
     @Override
     public void run() {
-        running.set(true);
-        while (running.get()) {
+        running = true;
+        while (running && !thread.isInterrupted()) {
             process();
             try {
                 Thread.sleep(this.delay);
@@ -143,5 +141,8 @@ public class Flame extends BufferedImage implements Runnable {
                 System.out.println("Flame - " + e.getMessage());
             }
         }
+
+        Thread.currentThread().interrupt();
+        System.out.println("thread finishes");
     }
 }
