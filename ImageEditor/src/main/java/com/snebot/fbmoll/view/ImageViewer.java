@@ -156,11 +156,12 @@ public class ImageViewer extends Canvas {
         Image resultImage = createImageFromTempMap(convolutionImage.getWidth(null), convolutionImage.getHeight(null), map);
         this.resultImage = ImageUtils.resize(resultImage, newWidth, newHeight);
 
-        /*map = testMap(200, 200);
-        int y = this.sourceImage.getHeight(null);
-        this.fireImage = resize(image, this.width, this.height - y);
-        this.flame = new Flame(200, 200, flameData, map);*/
-        //map = testMap(resultImage.getWidth(null), resultImage.getHeight(null));
+        /*int y = this.sourceImage.getHeight(null);
+        this.fireImage = ImageUtils.resize(image, this.width, this.height - y);
+        int fireW = fireImage.getWidth(null);
+        int fireH = fireImage.getHeight(null);
+        map = testMap(fireW, fireH);
+        this.flame = new Flame(fireW, fireH, flameData, map);*/
         int y = this.sourceImage.getHeight(null);
         this.fireImage = ImageUtils.resize(image, this.width, this.height - y);
         this.flame = new Flame(resultImage.getWidth(null), resultImage.getHeight(null), flameData, map);
@@ -187,7 +188,7 @@ public class ImageViewer extends Canvas {
             }
             update = false;
         }
-        if (this.flame != null && this.fireImage != null) {
+        if (this.flame != null && this.fireImage != null && sourceImage != null) {
             int y = sourceImage.getHeight(null);
             Image flameImage = ImageUtils.resize(flame, width, height - y);
             g.clearRect(0, y, width, height - y);
