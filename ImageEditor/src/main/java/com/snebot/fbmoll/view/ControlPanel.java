@@ -177,7 +177,7 @@ public class ControlPanel extends JPanel {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.gridy = ylevel;
         constraints.gridwidth = 2;
-        constraints.insets = new Insets(INSET_BIG, 0,INSET_BIG, 0);
+        constraints.insets = new Insets(0, INSET_BIG, 0, INSET_SMALL);
         panel.add(filePath, constraints);
 
         JLabel label = new JLabel();
@@ -187,7 +187,7 @@ public class ControlPanel extends JPanel {
         constraints.gridx = 2;
         constraints.gridwidth = 1;
         constraints.anchor = GridBagConstraints.LINE_END;
-        constraints.insets = new Insets(0, INSET_SMALL, INSET_BIG, INSET_BIG * 2);
+        constraints.insets = new Insets(0, INSET_SMALL, 0, INSET_BIG * 2);
         panel.add(label, constraints);
 
         ylevel += constraints.gridheight;
