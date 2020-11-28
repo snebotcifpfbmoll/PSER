@@ -11,6 +11,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ImageEditor extends JFrame implements ControlPanelDelegate {
     private static final int WINDOW_WIDTH = 1400;
@@ -55,11 +57,17 @@ public class ImageEditor extends JFrame implements ControlPanelDelegate {
         try {
             BufferedImage image = ImageIO.read(file);
             imageViewer.process(image, convolutionData, flameData);
-            Thread imageViewerThread = new Thread(imageViewer);
-            imageViewerThread.start();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("imageEditor.didApplyChanges() - " + e.getMessage());
+            e.printStackTrace();
         }
+
+        System.out.println("Thread list");
+        AtomicInteger i = new AtomicInteger();
+        Set<Thread> threads = Thread.getAllStackTraces().keySet();
+        threads.forEach(thread -> {
+            System.out.printf("%d - %s\n", i.getAndIncrement(), thread.toString());
+        });
     }
 
     @Override

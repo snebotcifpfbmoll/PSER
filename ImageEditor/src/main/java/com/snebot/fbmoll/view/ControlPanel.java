@@ -44,6 +44,7 @@ public class ControlPanel extends JPanel {
     private static final GridBagConstraints DEFAULT_CONSTRAINTS = new GridBagConstraints();
     private static final GridBagConstraints SEPARATOR_CONSTRAINTS = new GridBagConstraints();
     private static final FlameData DEFAULT_FLAME_DATA = new FlameData();
+
     static {
         final ColorPalette cp = new ColorPalette(256);
         cp.addColor(new Color(0, 0, 0, 0), 0);
@@ -142,7 +143,7 @@ public class ControlPanel extends JPanel {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.ipadx = 0;
         constraints.ipady = 0;
-        constraints.insets = new Insets(0, 0, 0,0);
+        constraints.insets = new Insets(0, 0, 0, 0);
         add(scroll, constraints);
 
         // Post UI setup

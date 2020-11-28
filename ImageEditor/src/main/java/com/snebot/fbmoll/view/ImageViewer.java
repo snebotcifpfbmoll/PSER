@@ -11,20 +11,25 @@ import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ImageViewer extends Canvas implements Runnable {
+public class ImageViewer extends Canvas {
     private int width = 1;
     private int height = 1;
     private Timer timer = null;
     public int delay = 10;
 
     private boolean update = true;
-    private Thread flameThread = null;
     private Image sourceImage = null;
     private Image convolutionImage = null;
     private Image resultImage = null;
     private Image fireImage = null;
     private Flame flame = null;
+
+    public boolean isRunning() {
+        if (this.timer == null) return false;
+        return this.timer.isRunning();
+    }
 
     public ImageViewer() {
         super();
@@ -34,9 +39,7 @@ public class ImageViewer extends Canvas implements Runnable {
         super();
         this.width = width;
         this.height = height;
-        timer = new Timer(this.delay, e -> {
-            paint();
-        });
+        timer = new Timer(this.delay, e -> { paint(); });
     }
 
     public byte[] convolution(byte[] src, int width, int height, int pro, int startX, int startY, int endX, int endY, int[][] conv, int K) {
@@ -175,6 +178,9 @@ public class ImageViewer extends Canvas implements Runnable {
         this.fireImage = resize(image, this.width, this.height - y);
         this.flame = new Flame(resultImage.getWidth(null), resultImage.getHeight(null), flameData, map);
         this.update = true;
+
+        this.stop();
+        this.start();
     }
 
     private void paint() {
@@ -204,20 +210,13 @@ public class ImageViewer extends Canvas implements Runnable {
         }
     }
 
-    @Override
-    public void run() {
-        if (this.flame != null) {
-            if (this.flameThread != null && this.flameThread.isAlive()) {
-                this.flame.animate = false;
-                try {
-                    this.flameThread.join(1000);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-            this.flameThread = new Thread(flame);
-            this.flameThread.start();
-        }
+    public void stop() {
+        if (flame != null) flame.stop();
+        if (timer != null) timer.stop();
+    }
+
+    public void start() {
+        flame.start();
         if (timer != null) timer.start();
     }
 
