@@ -6,7 +6,6 @@ import java.awt.*;
 public class Restaurant extends JFrame {
     private static final int WINDOW_WIDTH = 1200;
     private static final int WINDOW_HEIGHT = 800;
-    private Thread viewThread = null;
 
     private Restaurant() {
     }
@@ -24,9 +23,7 @@ public class Restaurant extends JFrame {
         constraints.weighty = 1;
         constraints.fill = GridBagConstraints.BOTH;
         add(restaurantView, constraints);
-
-        viewThread = new Thread(restaurantView);
-        viewThread.start();
+        restaurantView.start();
     }
 
     @Override

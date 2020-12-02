@@ -8,7 +8,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class RestaurantView extends Canvas implements Runnable {
-    private boolean running = false;
+    private final Thread thread = new Thread(this, "Restaurant view");
+    private volatile boolean running = false;
 
     public int viewWidth = 100;
     public int viewHeight = 100;
@@ -50,6 +51,14 @@ public class RestaurantView extends Canvas implements Runnable {
         this.viewHeight = height;
     }
 
+    public void start() {
+        thread.start();
+    }
+
+    public void stop() {
+        running = false;
+    }
+
     @Override
     public void run() {
         running = true;
@@ -63,13 +72,10 @@ public class RestaurantView extends Canvas implements Runnable {
         }
     }
 
-    public void stop() {
-        running = false;
-    }
-
     private void paint() {
         Graphics g = this.getGraphics();
         if (g == null) return;
+        super.paint(g);
 
         for (int i = 0; i < cooks.size(); i++) {
             Cook cook = cooks.get(i);

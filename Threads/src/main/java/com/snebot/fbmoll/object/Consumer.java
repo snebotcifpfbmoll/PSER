@@ -30,7 +30,32 @@ public class Consumer extends RestaurantObject {
         this.color = Color.RED;
 
         super.start(() -> {
-            if (table != null) table.take(this);
+            try {
+                Thread.sleep(getRandomTime());
+
+                int initialY = y;
+                int diff = y - table.y - table.height;
+                int nsteps = diff / step;
+                int res = diff % step;
+                for (int i = 0; i < nsteps; i++) {
+                    y -= step;
+                    Thread.sleep(speed);
+                }
+                y -= res;
+
+                table.take(this);
+
+                diff = initialY - y;
+                nsteps = diff / step;
+                res = diff % step;
+                for (int i = 0; i < nsteps; i++) {
+                    y += step;
+                    Thread.sleep(speed);
+                }
+                y += res;
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         });
     }
 }

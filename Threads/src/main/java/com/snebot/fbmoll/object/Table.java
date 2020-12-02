@@ -40,7 +40,7 @@ public class Table extends RestaurantObject {
         }
 
         foodCount--;
-        System.out.printf("table: %d; consumer: %d; count: %d\n", tableNumber, consumer.getId(), foodCount);
+        //System.out.printf("table: %d; consumer: %d; count: %d\n", tableNumber, consumer.getId(), foodCount);
         notifyAll();
     }
 
@@ -53,7 +53,7 @@ public class Table extends RestaurantObject {
             }
         }
         foodCount++;
-        System.out.printf("table: %d; cook: %d; count: %d\n", tableNumber, cook.getId(), foodCount);
+        //System.out.printf("table: %d; cook: %d; count: %d\n", tableNumber, cook.getId(), foodCount);
         notifyAll();
     }
 }

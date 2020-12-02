@@ -31,7 +31,32 @@ public class Cook extends RestaurantObject {
         this.color = Color.BLUE;
 
         super.start(() -> {
-            if (table != null) table.put(this);
+            try {
+                Thread.sleep(getRandomTime());
+
+                int initialY = y;
+                int diff = table.y - y - height;
+                int nsteps = diff / step;
+                int res = diff % step;
+                for (int i = 0; i < nsteps; i++) {
+                    y += step;
+                    Thread.sleep(speed);
+                }
+                y += res;
+
+                table.put(this);
+
+                diff = y - initialY;
+                nsteps = diff / step;
+                res = diff % step;
+                for (int i = 0; i < nsteps; i++) {
+                    y -= step;
+                    Thread.sleep(speed);
+                }
+                y -= res;
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         });
     }
 }
