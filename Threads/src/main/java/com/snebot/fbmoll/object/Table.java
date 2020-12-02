@@ -31,7 +31,7 @@ public class Table extends RestaurantObject {
     }
 
     public synchronized void take(Consumer consumer) {
-        while (foodCount < 1) {
+        while (this.foodCount < 1) {
             try {
                 wait();
             } catch (Exception e) {
@@ -39,20 +39,20 @@ public class Table extends RestaurantObject {
             }
         }
 
-        foodCount--;
+        this.foodCount--;
         //System.out.printf("table: %d; consumer: %d; count: %d\n", tableNumber, consumer.getId(), foodCount);
         notifyAll();
     }
 
     public synchronized void put(Cook cook) {
-        while (foodCount >= MAX_FOOD) {
+        while (this.foodCount >= MAX_FOOD) {
             try {
                 wait();
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }
-        foodCount++;
+        this.foodCount++;
         //System.out.printf("table: %d; cook: %d; count: %d\n", tableNumber, cook.getId(), foodCount);
         notifyAll();
     }

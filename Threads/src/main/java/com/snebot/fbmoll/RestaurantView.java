@@ -6,6 +6,7 @@ import com.snebot.fbmoll.object.Table;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class RestaurantView extends Canvas implements Runnable {
     private final Thread thread = new Thread(this, "Restaurant view");
@@ -13,11 +14,11 @@ public class RestaurantView extends Canvas implements Runnable {
 
     public int viewWidth = 100;
     public int viewHeight = 100;
-    private static final int padding = 20;
+    private static final int PADDING = 20;
 
-    private final ArrayList<Table> tables = new ArrayList<>();
-    private final ArrayList<Cook> cooks = new ArrayList<>();
-    private final ArrayList<Consumer> consumers = new ArrayList<>();
+    private final List<Table> tables = new ArrayList<>();
+    private final List<Cook> cooks = new ArrayList<>();
+    private final List<Consumer> consumers = new ArrayList<>();
 
     public void addTable(int count) {
         for (int i = 0; i < count; i++) tables.add(new Table(i));
@@ -32,7 +33,7 @@ public class RestaurantView extends Canvas implements Runnable {
         if (tables.size() == 0) return;
         for (int i = 0; i < count; i++) {
             Consumer consumer = new Consumer(i, tables.get(i % tables.size()));
-            consumer.y = (viewHeight - consumer.height - padding);
+            consumer.y = (viewHeight - consumer.height - PADDING);
             consumers.add(consumer);
         }
     }
@@ -84,10 +85,10 @@ public class RestaurantView extends Canvas implements Runnable {
             g.fillRect(cook.x, cook.y, cook.width, cook.height);
         }
 
-        int tableWidth = viewWidth / tables.size() - padding * 2;
+        int tableWidth = viewWidth / tables.size() - PADDING * 2;
         for (int i = 0; i < tables.size(); i++) {
             Table table = tables.get(i);
-            table.x = (viewWidth / tables.size()) * i + padding;
+            table.x = (viewWidth / tables.size()) * i + PADDING;
             table.y = viewHeight / 2 - table.height / 2;
             table.width = tableWidth;
             g.setColor(table.color);
