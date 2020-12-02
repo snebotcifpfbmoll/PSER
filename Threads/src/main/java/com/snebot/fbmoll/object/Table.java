@@ -1,17 +1,11 @@
-package com.snebot.fbmoll;
+package com.snebot.fbmoll.object;
 
 import java.awt.*;
 
-public class Table {
-    private static final int maxFoodCount = 5;
+public class Table extends RestaurantObject {
+    private static final int MAX_FOOD = 5;
     private int tableNumber = 0;
     private int foodCount = 0;
-
-    private int objectWidth = 200;
-    private int objectHeight = 80;
-    private int xPos = 0;
-    private int yPos = 0;
-    private Color color = Color.GRAY;
 
     public int getTableNumber() {
         return tableNumber;
@@ -21,48 +15,19 @@ public class Table {
         this.tableNumber = tableNumber;
     }
 
-    public int getObjectWidth() {
-        return objectWidth;
+    public int getFoodCount() {
+        return foodCount;
     }
 
-    public void setObjectWidth(int objectWidth) {
-        this.objectWidth = objectWidth;
-    }
-
-    public int getObjectHeight() {
-        return objectHeight;
-    }
-
-    public void setObjectHeight(int objectHeight) {
-        this.objectHeight = objectHeight;
-    }
-
-    public int getxPos() {
-        return xPos;
-    }
-
-    public void setxPos(int xPos) {
-        this.xPos = xPos;
-    }
-
-    public int getyPos() {
-        return yPos;
-    }
-
-    public void setyPos(int yPos) {
-        this.yPos = yPos;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
+    public void setFoodCount(int foodCount) {
+        this.foodCount = foodCount;
     }
 
     public Table(int tableNumber) {
         this.tableNumber = tableNumber;
+        this.width = 80;
+        this.height = 80;
+        this.color = Color.GRAY;
     }
 
     public synchronized void take(Consumer consumer) {
@@ -80,7 +45,7 @@ public class Table {
     }
 
     public synchronized void put(Cook cook) {
-        while (foodCount >= maxFoodCount) {
+        while (foodCount >= MAX_FOOD) {
             try {
                 wait();
             } catch (Exception e) {

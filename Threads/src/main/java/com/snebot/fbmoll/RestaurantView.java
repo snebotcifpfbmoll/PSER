@@ -1,5 +1,9 @@
 package com.snebot.fbmoll;
 
+import com.snebot.fbmoll.object.Consumer;
+import com.snebot.fbmoll.object.Cook;
+import com.snebot.fbmoll.object.Table;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -27,7 +31,7 @@ public class RestaurantView extends Canvas implements Runnable {
         if (tables.size() == 0) return;
         for (int i = 0; i < count; i++) {
             Consumer consumer = new Consumer(i, tables.get(i % tables.size()));
-            consumer.setyPos(viewHeight - consumer.getObjectHeight() - padding);
+            consumer.y = (viewHeight - consumer.height - padding);
             consumers.add(consumer);
         }
     }
@@ -69,26 +73,26 @@ public class RestaurantView extends Canvas implements Runnable {
 
         for (int i = 0; i < cooks.size(); i++) {
             Cook cook = cooks.get(i);
-            cook.setxPos((viewWidth / cooks.size()) * i + cook.getObjectWidth() / 2);
-            g.setColor(cook.getColor());
-            g.fillRect(cook.getxPos(), cook.getyPos(), cook.getObjectWidth(), cook.getObjectHeight());
+            cook.x = (viewWidth / cooks.size()) * i + cook.width / 2;
+            g.setColor(cook.color);
+            g.fillRect(cook.x, cook.y, cook.width, cook.height);
         }
 
         int tableWidth = viewWidth / tables.size() - padding * 2;
         for (int i = 0; i < tables.size(); i++) {
             Table table = tables.get(i);
-            table.setxPos((viewWidth / tables.size()) * i + padding);
-            table.setyPos(viewHeight / 2 - table.getObjectHeight() / 2);
-            table.setObjectWidth(tableWidth);
-            g.setColor(table.getColor());
-            g.fillRect(table.getxPos(), table.getyPos(), table.getObjectWidth(), table.getObjectHeight());
+            table.x = (viewWidth / tables.size()) * i + padding;
+            table.y = viewHeight / 2 - table.height / 2;
+            table.width = tableWidth;
+            g.setColor(table.color);
+            g.fillRect(table.x, table.y, table.width, table.height);
         }
 
         for (int i = 0; i < consumers.size(); i++) {
             Consumer consumer = consumers.get(i);
-            consumer.setxPos((viewWidth / consumers.size()) * i + consumer.getObjectWidth() / 2);
-            g.setColor(consumer.getColor());
-            g.fillRect(consumer.getxPos(), consumer.getyPos(), consumer.getObjectWidth(), consumer.getObjectHeight());
+            consumer.x = (viewWidth / consumers.size()) * i + consumer.width / 2;
+            g.setColor(consumer.color);
+            g.fillRect(consumer.x, consumer.y, consumer.width, consumer.height);
         }
     }
 
