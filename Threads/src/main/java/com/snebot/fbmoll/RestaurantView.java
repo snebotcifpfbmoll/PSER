@@ -14,34 +14,35 @@ public class RestaurantView extends Canvas implements Runnable {
 
     public int viewWidth = 100;
     public int viewHeight = 100;
+    public int delay = 40;
     private static final int PADDING = 20;
 
-    private final List<Table> tables = new ArrayList<>();
-    private final List<Cook> cooks = new ArrayList<>();
-    private final List<Consumer> consumers = new ArrayList<>();
+    private List<Table> tables = new ArrayList<>();
+    private List<Cook> cooks = new ArrayList<>();
+    private List<Consumer> consumers = new ArrayList<>();
 
-    public void addTable(int count) {
-        for (int i = 0; i < count; i++) tables.add(new Table(i));
+    public List<Table> getTables() {
+        return tables;
     }
 
-    public void addCook(int count) {
-        if (tables.size() == 0) return;
-        for (int i = 0; i < count; i++) cooks.add(new Cook(i, tables.get(i % tables.size())));
+    public void setTables(List<Table> tables) {
+        this.tables = tables;
     }
 
-    public void addConsumer(int count) {
-        if (tables.size() == 0) return;
-        for (int i = 0; i < count; i++) {
-            Consumer consumer = new Consumer(i, tables.get(i % tables.size()));
-            consumer.y = (viewHeight - consumer.height - PADDING);
-            consumers.add(consumer);
-        }
+    public List<Cook> getCooks() {
+        return cooks;
     }
 
-    public void add(int tableCount, int cookCount, int consumerCount) {
-        addTable(tableCount);
-        addCook(cookCount);
-        addConsumer(consumerCount);
+    public void setCooks(List<Cook> cooks) {
+        this.cooks = cooks;
+    }
+
+    public List<Consumer> getConsumers() {
+        return consumers;
+    }
+
+    public void setConsumers(List<Consumer> consumers) {
+        this.consumers = consumers;
     }
 
     public RestaurantView() {
@@ -66,7 +67,7 @@ public class RestaurantView extends Canvas implements Runnable {
         while (running) {
             try {
                 this.paint();
-                Thread.sleep(100);
+                Thread.sleep(delay);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -78,13 +79,6 @@ public class RestaurantView extends Canvas implements Runnable {
         if (g == null) return;
         super.paint(g);
 
-        for (int i = 0; i < cooks.size(); i++) {
-            Cook cook = cooks.get(i);
-            cook.x = (viewWidth / cooks.size()) * i + cook.width / 2;
-            g.setColor(cook.color);
-            g.fillRect(cook.x, cook.y, cook.width, cook.height);
-        }
-
         int tableWidth = viewWidth / tables.size() - PADDING * 2;
         for (int i = 0; i < tables.size(); i++) {
             Table table = tables.get(i);
@@ -93,11 +87,26 @@ public class RestaurantView extends Canvas implements Runnable {
             table.width = tableWidth;
             g.setColor(table.color);
             g.fillRect(table.x, table.y, table.width, table.height);
+
+            g.setColor(Color.RED);
+            g.setFont(new Font("Courier", Font.PLAIN, 35));
+            g.drawChars(String.valueOf(table.getFoodCount()).toCharArray(), 0, 1, table.x + table.width / 2, table.y + table.height / 2);
+        }
+
+        for (int i = 0; i < cooks.size(); i++) {
+            Cook cook = cooks.get(i);
+            int initx = cook.getTable().x;
+            int tableSize = cook.getTable().width;
+            cook.x = (tableSize / cooks.size()) * i + initx;
+            g.setColor(cook.color);
+            g.fillRect(cook.x, cook.y, cook.width, cook.height);
         }
 
         for (int i = 0; i < consumers.size(); i++) {
             Consumer consumer = consumers.get(i);
-            consumer.x = (viewWidth / consumers.size()) * i + consumer.width / 2;
+            int initx = consumer.getTable().x;
+            int tableSize = consumer.getTable().width;
+            consumer.x = (tableSize / consumers.size()) * i + initx;
             g.setColor(consumer.color);
             g.fillRect(consumer.x, consumer.y, consumer.width, consumer.height);
         }

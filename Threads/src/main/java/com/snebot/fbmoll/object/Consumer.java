@@ -29,6 +29,9 @@ public class Consumer extends RestaurantObject {
         this.height = 50;
         this.color = Color.RED;
 
+        this.minTime = 1000;
+        this.maxTime = 4000;
+
         super.start(() -> {
             try {
                 Thread.sleep(getRandomTime());
