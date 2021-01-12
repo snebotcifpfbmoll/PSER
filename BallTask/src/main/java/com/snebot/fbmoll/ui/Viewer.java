@@ -1,6 +1,5 @@
 package com.snebot.fbmoll.ui;
 
-import com.snebot.fbmoll.graphics.Ball;
 import com.snebot.fbmoll.graphics.VisibleObject;
 
 import java.awt.*;

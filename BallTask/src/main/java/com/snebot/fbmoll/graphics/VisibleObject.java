@@ -61,10 +61,10 @@ public abstract class VisibleObject {
     /**
      * Check if value is in range.
      *
-     * @param num
-     * @param min
-     * @param max
-     * @return
+     * @param num Value to check.
+     * @param min Minimun value range.
+     * @param max Maximum value range.
+     * @return Boolean.
      */
     private boolean inRange(int num, int min, int max) {
         return num >= min && num <= max;
@@ -77,14 +77,15 @@ public abstract class VisibleObject {
      * @return Boolean value.
      */
     public boolean touches(VisibleObject object) {
-        return inRange(this.x, object.x, object.x + object.width) &&
-                inRange(this.y, object.y, object.y + object.height) ||
-                inRange(this.x + this.width, object.x, object.x + object.width) &&
-                        inRange(this.y + this.height, object.y, object.y + object.height);
+        return (inRange(this.x, object.x, object.x + object.width) &&
+                inRange(this.y, object.y, object.y + object.height)) ||
+                (inRange(this.x + this.width, object.x, object.x + object.width) &&
+                        inRange(this.y + this.height, object.y, object.y + object.height));
     }
 
     /**
      * Paint visible object.
+     *
      * @param g Graphics context.
      */
     public abstract void paint(Graphics g);

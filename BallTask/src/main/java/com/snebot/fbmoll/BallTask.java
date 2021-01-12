@@ -18,23 +18,28 @@ public class BallTask extends JFrame implements StatisticsDataSource {
     private static final int VIEW_HEIGHT = 600;
     private static final int MIN_BALL_COUNT = 10;
     private static final int MAX_BALL_COUNT = 20;
-    private static final int MIN_BLACK_HOLE_COUNT = 2;
-    private static final int MAX_BLACK_HOLE_COUNT = 6;
+    private static final int BLACK_HOLE_COUNT = 2;
+    private static final int[][] BLACK_HOLE_COORDS = new int[BLACK_HOLE_COUNT][2];
+
+    static {
+        BLACK_HOLE_COORDS[0][0] = 200;
+        BLACK_HOLE_COORDS[0][1] = 100;
+        BLACK_HOLE_COORDS[1][0] = 800;
+        BLACK_HOLE_COORDS[1][1] = 300;
+    }
 
     private final Viewer viewer = new Viewer();
     private final ControlPanel controlPanel = new ControlPanel();
     private final List<VisibleObject> balls = new ArrayList<>();
-    private final List<VisibleObject> blackHoles = new ArrayList<VisibleObject>();
+    private final List<VisibleObject> blackHoles = new ArrayList<>();
 
     public BallTask() {
         setupUI();
 
-        for (int i = 0; i < getRandom(MIN_BLACK_HOLE_COUNT, MAX_BLACK_HOLE_COUNT); i++) {
+        for (int i = 0; i < BLACK_HOLE_COUNT; i++) {
             BlackHole blackHole = new BlackHole();
-            do {
-                blackHole.setX(getRandom(0, getWidth() - blackHole.getWidth()));
-                blackHole.setY(getRandom(0, getHeight() - blackHole.getHeight()));
-            } while (checkTouches(blackHole, this.blackHoles));
+            blackHole.setX(BLACK_HOLE_COORDS[i][0]);
+            blackHole.setY(BLACK_HOLE_COORDS[i][1]);
             this.blackHoles.add(blackHole);
         }
 
@@ -52,15 +57,6 @@ public class BallTask extends JFrame implements StatisticsDataSource {
         this.viewer.setBalls(this.balls);
         this.viewer.setBlackHoles(this.blackHoles);
         this.viewer.start();
-    }
-
-    private boolean checkTouches(VisibleObject source, List<VisibleObject> objects) {
-        boolean result = false;
-        for (int i = 0; i < objects.size() || result; i++) {
-            VisibleObject object = objects.get(i);
-            result = source.touches(object);
-        }
-        return result;
     }
 
     /**
@@ -102,42 +98,48 @@ public class BallTask extends JFrame implements StatisticsDataSource {
      *
      * @param ball New ball.
      */
-    public void addBall(Ball ball) {}
+    public void addBall(Ball ball) {
+    }
 
     /**
      * Remove ball from ball list.
      *
      * @param ball Ball to remove.
      */
-    public void removeBall(Ball ball) {}
+    public void removeBall(Ball ball) {
+    }
 
     /**
      * Generate an amount of balls.
      *
      * @param count Ball count.
      */
-    public void generateBall(int count) {}
+    public void generateBall(int count) {
+    }
 
     /**
      * Add a new black hole to black hole list.
      *
      * @param blackHole New black hole.
      */
-    public void addBlackHole(BlackHole blackHole) {}
+    public void addBlackHole(BlackHole blackHole) {
+    }
 
     /**
      * Remove a black hole from black hole list.
      *
      * @param blackHole Black hole to remove.
      */
-    public void removeBlackHole(BlackHole blackHole) {}
+    public void removeBlackHole(BlackHole blackHole) {
+    }
 
     /**
      * Generate an amount of black holes.
      *
      * @param count Black hole count.
      */
-    public void generateBlackHole(int count) {}
+    public void generateBlackHole(int count) {
+    }
 
     @Override
     public Statistics getStatistics() {

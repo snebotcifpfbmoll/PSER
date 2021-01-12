@@ -17,14 +17,16 @@ public class BlackHole extends VisibleObject implements Runnable {
      *
      * @param ball Crossing ball.
      */
-    public synchronized void put(Ball ball) {}
+    public synchronized void put(Ball ball) {
+    }
 
     /**
      * Remove a ball that has crossed the black hole.
      *
      * @param ball Crossed ball.
      */
-    public synchronized void remove(Ball ball) {}
+    public synchronized void remove(Ball ball) {
+    }
 
     /**
      * Start black hole thread.
