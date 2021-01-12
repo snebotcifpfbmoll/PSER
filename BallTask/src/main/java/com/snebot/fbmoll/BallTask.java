@@ -47,6 +47,7 @@ public class BallTask extends JFrame implements StatisticsDataSource {
             Ball ball = new Ball();
             ball.setX(getRandom(0, getWidth() - ball.getWidth()));
             ball.setY(getRandom(0, getHeight() - ball.getHeight()));
+            ball.start();
             this.balls.add(ball);
 
             this.blackHoles.forEach(blackHole -> {

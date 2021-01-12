@@ -4,8 +4,8 @@ import java.awt.*;
 
 public class Ball extends VisibleObject implements Runnable {
     private final Thread thread = new Thread(this, getClass().getSimpleName());
-    private int vx = 1;
-    private int vy = 1;
+    private int vx = 10;
+    private int vy = 10;
 
     public int getVx() {
         return vx;
@@ -35,6 +35,13 @@ public class Ball extends VisibleObject implements Runnable {
 
     @Override
     public void run() {
+        try {
+            this.x += this.vx;
+            this.y += this.vy;
+            Thread.sleep(this.delay);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
