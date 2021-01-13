@@ -12,7 +12,7 @@ public class Viewer extends Canvas implements Runnable {
     private List<VisibleObject> balls = null;
     private List<VisibleObject> blackHoles = null;
     private volatile boolean running = false;
-    private int delay = 40;
+    private int delay = 20;
 
     public int getVWidth() {
         return vwidth;
@@ -63,16 +63,18 @@ public class Viewer extends Canvas implements Runnable {
     }
 
     public Viewer() {
+        setIgnoreRepaint(true);
     }
 
     private void paint() {
         Graphics g = getGraphics();
         if (g == null) return;
-        this.balls.forEach(ball -> {
-            ball.paint(g);
-        });
+        g.clearRect(0, 0, this.getWidth(), this.getHeight());
         this.blackHoles.forEach(blackHole -> {
             blackHole.paint(g);
+        });
+        this.balls.forEach(ball -> {
+            ball.paint(g);
         });
     }
 

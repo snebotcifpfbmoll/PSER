@@ -4,8 +4,9 @@ import java.awt.*;
 
 public class Ball extends VisibleObject implements Runnable {
     private final Thread thread = new Thread(this, getClass().getSimpleName());
-    private int vx = 10;
-    private int vy = 10;
+    private int vx = 1;
+    private int vy = 1;
+    private volatile boolean animate = false;
 
     public int getVx() {
         return vx;
@@ -35,18 +36,21 @@ public class Ball extends VisibleObject implements Runnable {
 
     @Override
     public void run() {
-        try {
-            this.x += this.vx;
-            this.y += this.vy;
-            Thread.sleep(this.delay);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        this.animate = true;
+        while (this.animate) {
+            try {
+                this.x += this.vx;
+                this.y += this.vy;
+                Thread.sleep(this.delay);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
     @Override
     public void paint(Graphics g) {
         g.setColor(this.color);
-        g.fillOval(this.x, this.y, this.width, this.height);
+        g.fillOval(this.x, this.y, this.size.width, this.size.height);
     }
 }

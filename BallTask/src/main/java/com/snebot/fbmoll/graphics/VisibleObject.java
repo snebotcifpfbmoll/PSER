@@ -5,8 +5,7 @@ import java.awt.*;
 public abstract class VisibleObject {
     protected int x = 0;
     protected int y = 0;
-    protected int width = 40;
-    protected int height = 40;
+    protected Dimension size = new Dimension(40, 40);
     protected int delay = 20;
     protected Color color = Color.RED;
 
@@ -26,20 +25,12 @@ public abstract class VisibleObject {
         this.y = y;
     }
 
-    public int getWidth() {
-        return width;
+    public Dimension getSize() {
+        return size;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
+    public void setSize(Dimension size) {
+        this.size = size;
     }
 
     public int getDelay() {
@@ -77,10 +68,10 @@ public abstract class VisibleObject {
      * @return Boolean value.
      */
     public boolean touches(VisibleObject object) {
-        return (inRange(this.x, object.x, object.x + object.width) &&
-                inRange(this.y, object.y, object.y + object.height)) ||
-                (inRange(this.x + this.width, object.x, object.x + object.width) &&
-                        inRange(this.y + this.height, object.y, object.y + object.height));
+        return (inRange(this.x, object.x, object.x + object.size.width) &&
+                inRange(this.y, object.y, object.y + object.size.height)) ||
+                (inRange(this.x + this.size.width, object.x, object.x + object.size.width) &&
+                        inRange(this.y + this.size.height, object.y, object.y + object.size.height));
     }
 
     /**

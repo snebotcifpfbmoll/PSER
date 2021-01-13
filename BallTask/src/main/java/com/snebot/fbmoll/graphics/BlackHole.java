@@ -7,8 +7,8 @@ public class BlackHole extends VisibleObject implements Runnable {
     private Ball ball = null;
 
     public BlackHole() {
-        this.width = 200;
-        this.height = 100;
+        this.size.width = 200;
+        this.size.height = 100;
         this.color = Color.BLACK;
     }
 
@@ -42,6 +42,6 @@ public class BlackHole extends VisibleObject implements Runnable {
     @Override
     public void paint(Graphics g) {
         g.setColor(this.color);
-        g.fillRect(this.x, this.y, this.width, this.height);
+        g.fillRect(this.x, this.y, this.size.width, this.size.height);
     }
 }
