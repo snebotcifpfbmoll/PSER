@@ -39,8 +39,7 @@ public class Ball extends VisibleObject implements Runnable {
         this.animate = true;
         while (this.animate) {
             try {
-                this.x += this.vx;
-                this.y += this.vy;
+                this.point.translate(this.vx, this.vy);
                 Thread.sleep(this.delay);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -51,6 +50,6 @@ public class Ball extends VisibleObject implements Runnable {
     @Override
     public void paint(Graphics g) {
         g.setColor(this.color);
-        g.fillOval(this.x, this.y, this.size.width, this.size.height);
+        g.fillOval(this.point.x, this.point.y, this.size.width, this.size.height);
     }
 }

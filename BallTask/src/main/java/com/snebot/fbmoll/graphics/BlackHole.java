@@ -42,6 +42,6 @@ public class BlackHole extends VisibleObject implements Runnable {
     @Override
     public void paint(Graphics g) {
         g.setColor(this.color);
-        g.fillRect(this.x, this.y, this.size.width, this.size.height);
+        g.fillRect(this.point.x, this.point.y, this.size.width, this.size.height);
     }
 }

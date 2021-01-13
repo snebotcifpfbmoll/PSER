@@ -38,15 +38,15 @@ public class BallTask extends JFrame implements StatisticsDataSource {
 
         for (int i = 0; i < BLACK_HOLE_COUNT; i++) {
             BlackHole blackHole = new BlackHole();
-            blackHole.setX(BLACK_HOLE_COORDS[i][0]);
-            blackHole.setY(BLACK_HOLE_COORDS[i][1]);
+            blackHole.point.x = BLACK_HOLE_COORDS[i][0];
+            blackHole.point.y = BLACK_HOLE_COORDS[i][1];
             this.blackHoles.add(blackHole);
         }
 
         for (int i = 0; i < getRandom(MIN_BALL_COUNT, MAX_BALL_COUNT); i++) {
             Ball ball = new Ball();
-            ball.setX(getRandom(0, getWidth() - ball.getSize().width));
-            ball.setY(getRandom(0, getHeight() - ball.getSize().height));
+            ball.point.x = getRandom(0, getWidth() - ball.size.width);
+            ball.point.y = getRandom(0, getHeight() - ball.size.height);
             ball.start();
             this.balls.add(ball);
 
