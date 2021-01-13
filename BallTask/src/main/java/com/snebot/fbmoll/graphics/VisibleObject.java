@@ -39,7 +39,7 @@ public abstract class VisibleObject {
      * @param num Value to check.
      * @param min Minimun value range.
      * @param max Maximum value range.
-     * @return Boolean.
+     * @return True if in range, false otherwise.
      */
     private boolean inRange(int num, int min, int max) {
         return num >= min && num <= max;
@@ -49,13 +49,26 @@ public abstract class VisibleObject {
      * Check if touches with an other object.
      *
      * @param object Object to check.
-     * @return Boolean value.
+     * @return True if object touches, false otherwise.
      */
     public boolean touches(VisibleObject object) {
-        return (inRange(this.point.x, object.point.x, object.point.x + object.size.width) ||
-                inRange(this.point.x + this.size.width, object.point.x, object.point.x + object.size.width)) &&
-                        (inRange(this.point.y, object.point.y, object.point.y + object.size.height) ||
-                inRange(this.point.y + this.size.height, object.point.y, object.point.y + object.size.height));
+        return inBounds(object.point.x, object.point.y, object.size.width, object.size.height);
+    }
+
+    /**
+     * Check if object is inside of rect.
+     *
+     * @param x      X position.
+     * @param y      Y position.
+     * @param width  Rect width.
+     * @param height Rect height.
+     * @return True if object is in bounds, false otherwise.
+     */
+    public boolean inBounds(int x, int y, int width, int height) {
+        return (inRange(this.point.x, x, x + width) ||
+                inRange(this.point.x + this.size.width, x, x + width)) &&
+                (inRange(this.point.y, y, y + height) ||
+                        inRange(this.point.y + this.size.height, y, y + height));
     }
 
     /**

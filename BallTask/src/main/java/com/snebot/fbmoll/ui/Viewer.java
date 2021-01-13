@@ -60,8 +60,24 @@ public class Viewer extends JComponent implements Runnable {
         });
     }
 
+    /**
+     * Start viewer thread.
+     */
     public void start() {
         this.thread.start();
+    }
+
+    /**
+     * Stop viewer thread.
+     */
+    public void stop() {
+        this.running = false;
+        try {
+            this.thread.join();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -73,6 +89,7 @@ public class Viewer extends JComponent implements Runnable {
                 Thread.sleep(this.delay);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
+                e.printStackTrace();
             }
         }
     }

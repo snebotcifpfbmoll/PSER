@@ -160,7 +160,9 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
     @Override
     public boolean ballCanMove(Ball ball) {
         boolean result = true;
-        for (VisibleObject blackHole : this.blackHoles) result = !ball.touches(blackHole);
+        for (int i = 0; i < this.blackHoles.size() && result; i++) {
+            result = !ball.touches(this.blackHoles.get(i));
+        }
         return result;
     }
 }
