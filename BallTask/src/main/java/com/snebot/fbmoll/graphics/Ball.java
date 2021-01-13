@@ -8,6 +8,7 @@ public class Ball extends VisibleObject implements Runnable {
     public BallDelegate delegate = null;
 
     public Ball() {
+        this.delay = 10;
     }
 
     /**

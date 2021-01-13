@@ -19,6 +19,8 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
     private static final int VIEW_HEIGHT = 600;
     private static final int MIN_BALL_COUNT = 10;
     private static final int MAX_BALL_COUNT = 15;
+    private static final int MIN_BALL_SPEED = -5;
+    private static final int MAX_BALL_SPEED = 5;
     private static final int BLACK_HOLE_COUNT = 2;
     private static final int[][] BLACK_HOLE_COORDS = new int[BLACK_HOLE_COUNT][2];
 
@@ -101,9 +103,24 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
     }
 
     /**
+     * Generate a random delta within range that's non zero.
+     *
+     * @param min Minimum value.
+     * @param max Maximum value.
+     * @return Non zero delta.
+     */
+    public int nonZeroDelta(int min, int max) {
+        int result = 0;
+        do {
+            result = getRandom(min, max);
+        } while (result == 0);
+        return result;
+    }
+
+    /**
      * Generate an amount of balls.
      *
-     * @param list Ball list.
+     * @param list  Ball list.
      * @param count Ball count.
      */
     public void generateBall(List<VisibleObject> list, int count) {
@@ -112,6 +129,8 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
             ball.delegate = this;
             ball.point.x = getRandom(0, getWidth() - ball.size.width);
             ball.point.y = getRandom(0, getHeight() - ball.size.height);
+            ball.deltaX = nonZeroDelta(MIN_BALL_SPEED, MAX_BALL_SPEED);
+            ball.deltaY = nonZeroDelta(MIN_BALL_SPEED, MAX_BALL_SPEED);
             ball.start();
             list.add(ball);
         }
@@ -152,9 +171,7 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            BallTask ballTask = new BallTask();
-        });
+        SwingUtilities.invokeLater(BallTask::new);
     }
 
     @Override
@@ -162,6 +179,17 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
         boolean result = true;
         for (int i = 0; i < this.blackHoles.size() && result; i++) {
             result = !ball.touches(this.blackHoles.get(i));
+        }
+        if (result) {
+            result = ball.inBounds(0, 0, getWidth() - ball.size.width, getHeight() - ball.size.height);
+            if (!result) {
+                result = true;
+                if ((ball.deltaX > 0 && ball.deltaY > 0) || (ball.deltaX < 0 && ball.deltaY < 0)) {
+                    ball.deltaX = -ball.deltaX;
+                } else if ((ball.deltaX > 0 && ball.deltaY < 0) || (ball.deltaX < 0 && ball.deltaY > 0)) {
+                    ball.deltaY = -ball.deltaY;
+                }
+            }
         }
         return result;
     }
