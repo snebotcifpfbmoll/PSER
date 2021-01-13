@@ -2,17 +2,18 @@ package com.snebot.fbmoll.ui;
 
 import com.snebot.fbmoll.graphics.VisibleObject;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class Viewer extends Canvas implements Runnable {
+public class Viewer extends JComponent implements Runnable {
     private final Thread thread = new Thread(this, getClass().getSimpleName());
     private int vwidth = 0;
     private int vheight = 0;
     private List<VisibleObject> balls = null;
     private List<VisibleObject> blackHoles = null;
     private volatile boolean running = false;
-    private int delay = 20;
+    private int delay = 16;
 
     public int getVWidth() {
         return vwidth;
@@ -66,10 +67,9 @@ public class Viewer extends Canvas implements Runnable {
         setIgnoreRepaint(true);
     }
 
-    private void paint() {
-        Graphics g = getGraphics();
-        if (g == null) return;
-        g.clearRect(0, 0, this.getWidth(), this.getHeight());
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
         this.blackHoles.forEach(blackHole -> {
             blackHole.paint(g);
         });
@@ -87,7 +87,7 @@ public class Viewer extends Canvas implements Runnable {
         this.running = true;
         while (this.running) {
             try {
-                paint();
+                repaint();
                 Thread.sleep(this.delay);
             } catch (Exception e) {
                 System.out.println(e.getMessage());

@@ -72,9 +72,9 @@ public class BallTask extends JFrame implements StatisticsDataSource {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.anchor = GridBagConstraints.CENTER;
         constraints.fill = GridBagConstraints.BOTH;
-        constraints.gridx = constraints.gridwidth;
+        constraints.gridx = 0;
         constraints.gridy = 0;
-        constraints.weightx = 0.1;
+        constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.gridwidth = 6;
         pane.add(this.viewer, constraints);
