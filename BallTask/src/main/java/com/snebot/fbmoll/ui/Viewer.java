@@ -8,28 +8,10 @@ import java.util.List;
 
 public class Viewer extends JComponent implements Runnable {
     private final Thread thread = new Thread(this, getClass().getSimpleName());
-    private int vwidth = 0;
-    private int vheight = 0;
     private List<VisibleObject> balls = null;
     private List<VisibleObject> blackHoles = null;
     private volatile boolean running = false;
     private int delay = 16;
-
-    public int getVWidth() {
-        return vwidth;
-    }
-
-    public void setVWidth(int vwidth) {
-        this.vwidth = vwidth;
-    }
-
-    public int getVHeight() {
-        return vheight;
-    }
-
-    public void setVHeight(int vheight) {
-        this.vheight = vheight;
-    }
 
     public List<VisibleObject> getBalls() {
         return balls;
@@ -93,10 +75,5 @@ public class Viewer extends JComponent implements Runnable {
                 System.out.println(e.getMessage());
             }
         }
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(this.vwidth, this.vheight);
     }
 }

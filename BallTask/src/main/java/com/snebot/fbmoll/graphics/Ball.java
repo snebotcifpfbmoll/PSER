@@ -4,25 +4,8 @@ import java.awt.*;
 
 public class Ball extends VisibleObject implements Runnable {
     private final Thread thread = new Thread(this, getClass().getSimpleName());
-    private int vx = 1;
-    private int vy = 1;
     private volatile boolean animate = false;
-
-    public int getVx() {
-        return vx;
-    }
-
-    public void setVx(int vx) {
-        this.vx = vx;
-    }
-
-    public int getVy() {
-        return vy;
-    }
-
-    public void setVy(int vy) {
-        this.vy = vy;
-    }
+    public BallDelegate delegate = null;
 
     public Ball() {
     }
@@ -34,12 +17,24 @@ public class Ball extends VisibleObject implements Runnable {
         this.thread.start();
     }
 
+    /**
+     * Stop ball thread.
+     */
+    public void stop() {
+        this.animate = false;
+        try {
+            this.thread.join();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     @Override
     public void run() {
         this.animate = true;
-        while (this.animate) {
+        while (this.animate && delegate != null) {
             try {
-                this.point.translate(this.vx, this.vy);
+                if (delegate.ballCanMove(this)) this.step();
                 Thread.sleep(this.delay);
             } catch (Exception e) {
                 System.out.println(e.getMessage());

@@ -3,6 +3,7 @@ package com.snebot.fbmoll;
 import com.snebot.fbmoll.data.Statistics;
 import com.snebot.fbmoll.data.StatisticsDataSource;
 import com.snebot.fbmoll.graphics.Ball;
+import com.snebot.fbmoll.graphics.BallDelegate;
 import com.snebot.fbmoll.graphics.BlackHole;
 import com.snebot.fbmoll.graphics.VisibleObject;
 import com.snebot.fbmoll.ui.ControlPanel;
@@ -13,11 +14,11 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BallTask extends JFrame implements StatisticsDataSource {
+public class BallTask extends JFrame implements StatisticsDataSource, BallDelegate {
     private static final int VIEW_WIDTH = 1200;
     private static final int VIEW_HEIGHT = 600;
     private static final int MIN_BALL_COUNT = 10;
-    private static final int MAX_BALL_COUNT = 20;
+    private static final int MAX_BALL_COUNT = 15;
     private static final int BLACK_HOLE_COUNT = 2;
     private static final int[][] BLACK_HOLE_COORDS = new int[BLACK_HOLE_COUNT][2];
 
@@ -43,17 +44,7 @@ public class BallTask extends JFrame implements StatisticsDataSource {
             this.blackHoles.add(blackHole);
         }
 
-        for (int i = 0; i < getRandom(MIN_BALL_COUNT, MAX_BALL_COUNT); i++) {
-            Ball ball = new Ball();
-            ball.point.x = getRandom(0, getWidth() - ball.size.width);
-            ball.point.y = getRandom(0, getHeight() - ball.size.height);
-            ball.start();
-            this.balls.add(ball);
-
-            this.blackHoles.forEach(blackHole -> {
-                if (ball.touches(blackHole)) ball.setColor(Color.BLUE);
-            });
-        }
+        generateBall(this.balls, getRandom(MIN_BALL_COUNT, MAX_BALL_COUNT));
 
         this.viewer.setBalls(this.balls);
         this.viewer.setBlackHoles(this.blackHoles);
@@ -74,9 +65,8 @@ public class BallTask extends JFrame implements StatisticsDataSource {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.gridx = 0;
         constraints.gridy = 0;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.gridwidth = 6;
+        constraints.weightx = 0.1;
+        constraints.weighty = 0.1;
         pane.add(this.viewer, constraints);
 
         pack();
@@ -113,9 +103,18 @@ public class BallTask extends JFrame implements StatisticsDataSource {
     /**
      * Generate an amount of balls.
      *
+     * @param list Ball list.
      * @param count Ball count.
      */
-    public void generateBall(int count) {
+    public void generateBall(List<VisibleObject> list, int count) {
+        for (int i = 0; i < count; i++) {
+            Ball ball = new Ball();
+            ball.delegate = this;
+            ball.point.x = getRandom(0, getWidth() - ball.size.width);
+            ball.point.y = getRandom(0, getHeight() - ball.size.height);
+            ball.start();
+            list.add(ball);
+        }
     }
 
     /**
@@ -156,5 +155,12 @@ public class BallTask extends JFrame implements StatisticsDataSource {
         SwingUtilities.invokeLater(() -> {
             BallTask ballTask = new BallTask();
         });
+    }
+
+    @Override
+    public boolean ballCanMove(Ball ball) {
+        boolean result = true;
+        for (VisibleObject blackHole : this.blackHoles) result = !ball.touches(blackHole);
+        return result;
     }
 }

@@ -5,6 +5,8 @@ import java.awt.*;
 public abstract class VisibleObject {
     public Point point = new Point(0, 0);
     public Dimension size = new Dimension(40, 40);
+    public int deltaX = 1;
+    public int deltaY = 1;
     protected int delay = 20;
     protected Color color = Color.RED;
 
@@ -22,6 +24,13 @@ public abstract class VisibleObject {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    /**
+     * Change current object position by current delta.
+     */
+    public void step() {
+        this.point.translate(this.deltaX, this.deltaY);
     }
 
     /**
@@ -43,10 +52,10 @@ public abstract class VisibleObject {
      * @return Boolean value.
      */
     public boolean touches(VisibleObject object) {
-        return (inRange(this.point.x, object.point.x, object.point.x + object.size.width) &&
-                inRange(this.point.y, object.point.y, object.point.y + object.size.height)) ||
-                (inRange(this.point.x + this.size.width, object.point.x, object.point.x + object.size.width) &&
-                        inRange(this.point.y + this.size.height, object.point.y, object.point.y + object.size.height));
+        return (inRange(this.point.x, object.point.x, object.point.x + object.size.width) ||
+                inRange(this.point.x + this.size.width, object.point.x, object.point.x + object.size.width)) &&
+                        (inRange(this.point.y, object.point.y, object.point.y + object.size.height) ||
+                inRange(this.point.y + this.size.height, object.point.y, object.point.y + object.size.height));
     }
 
     /**
