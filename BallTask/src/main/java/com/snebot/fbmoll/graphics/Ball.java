@@ -33,9 +33,11 @@ public class Ball extends VisibleObject implements Runnable {
     @Override
     public void run() {
         this.animate = true;
-        while (this.animate && delegate != null) {
+        while (this.animate && this.delegate != null) {
             try {
-                if (delegate.ballCanMove(this)) this.step();
+                this.color = this.delegate.willTouchBlackHole(this) ? Color.BLUE : Color.red;
+                this.delegate.willBounce(this);
+                this.step();
                 Thread.sleep(this.delay);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -47,5 +49,14 @@ public class Ball extends VisibleObject implements Runnable {
     public void paint(Graphics g) {
         g.setColor(this.color);
         g.fillOval(this.point.x, this.point.y, this.size.width, this.size.height);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof Ball)) return false;
+        Ball ball = (Ball) obj;
+        return this.thread.equals(ball.thread) &&
+                this.delegate.equals(ball.delegate);
     }
 }

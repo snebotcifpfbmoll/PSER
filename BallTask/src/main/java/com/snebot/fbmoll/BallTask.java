@@ -170,27 +170,31 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
         return new Dimension(VIEW_WIDTH, VIEW_HEIGHT);
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(BallTask::new);
+    @Override
+    public boolean willTouchBlackHole(Ball ball) {
+        boolean touch = false;
+        BlackHole blackHole = null;
+        for (int i = 0; i < this.blackHoles.size() && !touch; i++) {
+            blackHole = (BlackHole) this.blackHoles.get(i);
+            touch = ball.touches(blackHole);
+            if (touch) blackHole.put(ball);
+            if (!touch && blackHole.checkBall(ball)) blackHole.remove(ball);
+        }
+        return touch;
     }
 
     @Override
-    public boolean ballCanMove(Ball ball) {
-        boolean result = true;
-        for (int i = 0; i < this.blackHoles.size() && result; i++) {
-            result = !ball.touches(this.blackHoles.get(i));
-        }
-        if (result) {
-            result = ball.inBounds(0, 0, getWidth() - ball.size.width, getHeight() - ball.size.height);
-            if (!result) {
-                result = true;
-                if ((ball.deltaX > 0 && ball.deltaY > 0) || (ball.deltaX < 0 && ball.deltaY < 0)) {
-                    ball.deltaX = -ball.deltaX;
-                } else if ((ball.deltaX > 0 && ball.deltaY < 0) || (ball.deltaX < 0 && ball.deltaY > 0)) {
-                    ball.deltaY = -ball.deltaY;
-                }
+    public void willBounce(Ball ball) {
+        if (!ball.inBounds(0, 0, getWidth() - ball.size.width, getHeight() - ball.size.height)) {
+            if ((ball.deltaX > 0 && ball.deltaY > 0) || (ball.deltaX < 0 && ball.deltaY < 0)) {
+                ball.deltaX = -ball.deltaX;
+            } else if ((ball.deltaX > 0 && ball.deltaY < 0) || (ball.deltaX < 0 && ball.deltaY > 0)) {
+                ball.deltaY = -ball.deltaY;
             }
         }
-        return result;
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(BallTask::new);
     }
 }
