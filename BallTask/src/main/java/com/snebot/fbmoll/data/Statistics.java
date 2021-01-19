@@ -47,4 +47,11 @@ public class Statistics {
         this.insideBallCount = insideBallCount;
         this.stoppedBallCount = stoppedBallCount;
     }
+
+    public String[] toArray() {
+        return new String[]{String.valueOf(ballCount),
+                String.valueOf(outsideBallCount),
+                String.valueOf(insideBallCount),
+                String.valueOf(stoppedBallCount)};
+    }
 }

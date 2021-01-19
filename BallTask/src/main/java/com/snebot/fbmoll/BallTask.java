@@ -67,8 +67,13 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
         constraints.fill = GridBagConstraints.BOTH;
         constraints.gridx = 0;
         constraints.gridy = 0;
-        constraints.weightx = 0.1;
-        constraints.weighty = 0.1;
+        constraints.weightx = 0.2;
+        constraints.weighty = 1.0;
+        pane.add(this.controlPanel, constraints);
+
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.gridx = 1;
+        constraints.weightx = 0.8;
         pane.add(this.viewer, constraints);
 
         pack();
@@ -127,8 +132,8 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
         for (int i = 0; i < count; i++) {
             Ball ball = new Ball();
             ball.delegate = this;
-            ball.point.x = getRandom(0, getWidth() - ball.size.width);
-            ball.point.y = getRandom(0, getHeight() - ball.size.height);
+            ball.point.x = getRandom(0, this.viewer.getWidth() - ball.size.width);
+            ball.point.y = getRandom(0, this.viewer.getHeight() - ball.size.height);
             ball.deltaX = nonZeroDelta(MIN_BALL_SPEED, MAX_BALL_SPEED);
             ball.deltaY = nonZeroDelta(MIN_BALL_SPEED, MAX_BALL_SPEED);
             ball.start();
@@ -162,12 +167,7 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
 
     @Override
     public Statistics getStatistics() {
-        return null;
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(VIEW_WIDTH, VIEW_HEIGHT);
+        return new Statistics(5, 6, 7, 8);
     }
 
     @Override
@@ -185,13 +185,18 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
 
     @Override
     public void willBounce(Ball ball) {
-        if (!ball.inBounds(0, 0, getWidth() - ball.size.width, getHeight() - ball.size.height)) {
+        if (!ball.inBounds(0, 0, this.viewer.getWidth() - ball.size.width, this.viewer.getHeight() - ball.size.height)) {
             if ((ball.deltaX > 0 && ball.deltaY > 0) || (ball.deltaX < 0 && ball.deltaY < 0)) {
                 ball.deltaX = -ball.deltaX;
             } else if ((ball.deltaX > 0 && ball.deltaY < 0) || (ball.deltaX < 0 && ball.deltaY > 0)) {
                 ball.deltaY = -ball.deltaY;
             }
         }
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(VIEW_WIDTH, VIEW_HEIGHT);
     }
 
     public static void main(String[] args) {
