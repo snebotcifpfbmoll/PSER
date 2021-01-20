@@ -9,14 +9,16 @@ import com.snebot.fbmoll.graphics.VisibleObject;
 import com.snebot.fbmoll.ui.ControlPanel;
 import com.snebot.fbmoll.ui.ControlPanelDelegate;
 import com.snebot.fbmoll.ui.Viewer;
+import com.snebot.fbmoll.ui.ViewerDelegate;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class BallTask extends JFrame implements StatisticsDataSource, BallDelegate, ControlPanelDelegate {
+public class BallTask extends JFrame implements StatisticsDataSource, BallDelegate, ControlPanelDelegate, ViewerDelegate {
     private static final int VIEW_WIDTH = 1200;
     private static final int VIEW_HEIGHT = 600;
     private static final int MIN_BALL_COUNT = 10;
@@ -33,7 +35,7 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
         BLACK_HOLE_COORDS[1][1] = 300;
     }
 
-    private final Viewer viewer = new Viewer();
+    private final Viewer viewer = new Viewer(this);
     private final ControlPanel controlPanel = new ControlPanel(150, VIEW_HEIGHT);
     private final List<VisibleObject> balls = new ArrayList<>();
     private final List<VisibleObject> blackHoles = new ArrayList<>();
@@ -50,8 +52,8 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
 
         generateBall(this.balls, getRandom(MIN_BALL_COUNT, MAX_BALL_COUNT));
 
-        this.viewer.setBalls(this.balls);
-        this.viewer.setBlackHoles(this.blackHoles);
+        //this.viewer.setBalls(this.balls);
+        //this.viewer.setBlackHoles(this.blackHoles);
         this.viewer.start();
     }
 
@@ -127,6 +129,11 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
     }
 
     @Override
+    public List<VisibleObject> getVisibleObjects() {
+        return Stream.concat(this.blackHoles.stream(), this.balls.stream()).collect(Collectors.toList());
+    }
+
+    @Override
     public Statistics getStatistics() {
         return new Statistics(5, 6, 7, 8);
     }
@@ -183,7 +190,7 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
                 ball.stop();
             }
         });
-        for (VisibleObject obj : this.balls) this.balls.remove(obj);
+        this.balls.clear();
     }
 
     @Override

@@ -8,25 +8,16 @@ import java.util.List;
 
 public class Viewer extends JComponent implements Runnable {
     private final Thread thread = new Thread(this, getClass().getSimpleName());
-    private List<VisibleObject> balls = null;
-    private List<VisibleObject> blackHoles = null;
+    private ViewerDelegate delegate = null;
     private volatile boolean running = false;
     private int delay = 16;
 
-    public List<VisibleObject> getBalls() {
-        return balls;
+    public ViewerDelegate getDelegate() {
+        return delegate;
     }
 
-    public void setBalls(List<VisibleObject> balls) {
-        this.balls = balls;
-    }
-
-    public List<VisibleObject> getBlackHoles() {
-        return blackHoles;
-    }
-
-    public void setBlackHoles(List<VisibleObject> blackHoles) {
-        this.blackHoles = blackHoles;
+    public void setDelegate(ViewerDelegate delegate) {
+        this.delegate = delegate;
     }
 
     public boolean isRunning() {
@@ -50,15 +41,20 @@ public class Viewer extends JComponent implements Runnable {
         setIgnoreRepaint(true);
     }
 
+    public Viewer(ViewerDelegate delegate) {
+        super();
+        this.delegate = delegate;
+        setIgnoreRepaint(true);
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        this.blackHoles.forEach(blackHole -> {
-            blackHole.paint(g);
-        });
-        this.balls.forEach(ball -> {
-            ball.paint(g);
-        });
+        if (this.delegate != null) {
+            this.delegate.getVisibleObjects().forEach(obj -> {
+                obj.paint(g);
+            });
+        }
     }
 
     /**
@@ -74,7 +70,7 @@ public class Viewer extends JComponent implements Runnable {
     public void stop() {
         this.running = false;
         try {
-            this.thread.join();
+            this.thread.join(1000);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();

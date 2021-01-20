@@ -75,8 +75,6 @@ public class Ball extends VisibleObject implements Runnable {
     public boolean equals(Object obj) {
         if (obj == null) return false;
         if (!(obj instanceof Ball)) return false;
-        Ball ball = (Ball) obj;
-        return this.thread.equals(ball.thread) &&
-                this.delegate.equals(ball.delegate);
+        return super.equals(obj);
     }
 }
