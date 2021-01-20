@@ -34,6 +34,7 @@ public class ControlPanel extends JPanel implements Runnable {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = ylevel;
+        constraints.gridwidth = 2;
         constraints.weightx = 0.1;
         constraints.weighty = 0.1;
         constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -46,6 +47,28 @@ public class ControlPanel extends JPanel implements Runnable {
         scroll.setMaximumSize(new Dimension(150, 200));
         add(scroll, constraints);
         updateTable();
+
+        constraints.gridwidth = 1;
+        ylevel += constraints.gridheight;
+        constraints.gridy = ylevel;
+
+        JButton play = new JButton("Play");
+        add(play, constraints);
+
+        constraints.gridx = 1;
+
+        JButton pause = new JButton("Pause");
+        add(pause, constraints);
+
+        ylevel += constraints.gridheight;
+        constraints.gridy = ylevel;
+        constraints.gridx = 0;
+
+        JButton stop = new JButton("Stop");
+        add(stop, constraints);
+
+        play.addActionListener(e -> {
+        });
     }
 
     public void updateTable() {

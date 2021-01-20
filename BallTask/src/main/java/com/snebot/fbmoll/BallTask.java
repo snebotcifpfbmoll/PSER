@@ -67,13 +67,12 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
         constraints.fill = GridBagConstraints.BOTH;
         constraints.gridx = 0;
         constraints.gridy = 0;
-        constraints.weightx = 0.2;
+        constraints.weightx = 0.1;
         constraints.weighty = 1.0;
         pane.add(this.controlPanel, constraints);
 
-        constraints.fill = GridBagConstraints.BOTH;
         constraints.gridx = 1;
-        constraints.weightx = 0.8;
+        constraints.weightx = 0.9;
         pane.add(this.viewer, constraints);
 
         pack();
