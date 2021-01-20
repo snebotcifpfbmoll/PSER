@@ -32,7 +32,7 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
     }
 
     private final Viewer viewer = new Viewer();
-    private final ControlPanel controlPanel = new ControlPanel();
+    private final ControlPanel controlPanel = new ControlPanel(150, VIEW_HEIGHT);
     private final List<VisibleObject> balls = new ArrayList<>();
     private final List<VisibleObject> blackHoles = new ArrayList<>();
 

@@ -27,6 +27,7 @@ public class Ball extends VisibleObject implements Runnable {
             this.thread.join();
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -41,6 +42,7 @@ public class Ball extends VisibleObject implements Runnable {
                 Thread.sleep(this.delay);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
+                e.printStackTrace();
             }
         }
     }

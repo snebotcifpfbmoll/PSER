@@ -27,9 +27,9 @@ public class BlackHole extends VisibleObject implements Runnable {
                 wait();
             } catch (Exception e) {
                 System.out.println(e.getMessage());
+                e.printStackTrace();
             }
         }
-
         this.balls.add(ball);
         notifyAll();
     }

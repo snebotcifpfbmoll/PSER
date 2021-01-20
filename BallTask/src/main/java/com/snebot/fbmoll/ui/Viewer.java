@@ -46,6 +46,7 @@ public class Viewer extends JComponent implements Runnable {
     }
 
     public Viewer() {
+        super();
         setIgnoreRepaint(true);
     }
 

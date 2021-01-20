@@ -3,18 +3,26 @@ package com.snebot.fbmoll.ui;
 import com.snebot.fbmoll.data.Statistics;
 
 import javax.swing.*;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class ControlPanel extends JPanel implements Runnable, TableModel {
-    private final Thread thread = new Thread(this, getClass().getSimpleName());
-    private final JTable table = new JTable(this);
-    private final JScrollPane tableScroll = new JScrollPane(table);
-    private Statistics statistics = new Statistics(5, 6, 7, 8);
+public class ControlPanel extends JPanel implements Runnable {
+    private int vWidth = 1;
+    private int vHeight = 1;
 
-    public ControlPanel() {
+    private static final int SMALL_INSET = 5;
+
+    private final Thread thread = new Thread(this, getClass().getSimpleName());
+    private Statistics statistics = new Statistics(5, 6, 7, 8);
+    private DefaultTableModel model = new DefaultTableModel();
+
+    private ControlPanel() {
+    }
+
+    public ControlPanel(int width, int height) {
         super();
+        this.vWidth = width;
+        this.vHeight = height;
         setup();
     }
 
@@ -26,8 +34,28 @@ public class ControlPanel extends JPanel implements Runnable, TableModel {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = ylevel;
-        this.tableScroll.setMaximumSize(new Dimension(100, 100));
-        add(this.tableScroll, constraints);
+        constraints.weightx = 0.1;
+        constraints.weighty = 0.1;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.insets = new Insets(SMALL_INSET, SMALL_INSET, SMALL_INSET, SMALL_INSET);
+        constraints.anchor = GridBagConstraints.PAGE_START;
+
+        JTable table = new JTable(this.model);
+        JScrollPane scroll = new JScrollPane(table);
+        scroll.setMinimumSize(new Dimension(100, 100));
+        scroll.setMaximumSize(new Dimension(150, 200));
+        add(scroll, constraints);
+        updateTable();
+    }
+
+    public void updateTable() {
+        if (this.statistics == null) return;
+        String[][] data = this.statistics.toArray();
+        this.model.addColumn("Name");
+        this.model.addColumn("Count");
+        for (String[] rowData : data) {
+            this.model.addRow(rowData);
+        }
     }
 
     public void start() {
@@ -39,46 +67,7 @@ public class ControlPanel extends JPanel implements Runnable, TableModel {
     }
 
     @Override
-    public int getRowCount() {
-        if (this.statistics == null) return 0;
-        return this.statistics.toArray().length;
-    }
-
-    @Override
-    public int getColumnCount() {
-        if (this.statistics == null) return 0;
-        return 2;
-    }
-
-    @Override
-    public String getColumnName(int columnIndex) {
-        return null;
-    }
-
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        return null;
-    }
-
-    @Override
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return false;
-    }
-
-    @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        return this.statistics.toArray()[rowIndex];
-    }
-
-    @Override
-    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-    }
-
-    @Override
-    public void addTableModelListener(TableModelListener l) {
-    }
-
-    @Override
-    public void removeTableModelListener(TableModelListener l) {
+    public Dimension getPreferredSize() {
+        return new Dimension(this.vWidth, this.vHeight);
     }
 }

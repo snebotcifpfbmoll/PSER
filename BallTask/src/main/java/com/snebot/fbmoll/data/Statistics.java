@@ -48,10 +48,10 @@ public class Statistics {
         this.stoppedBallCount = stoppedBallCount;
     }
 
-    public String[] toArray() {
-        return new String[]{String.valueOf(ballCount),
-                String.valueOf(outsideBallCount),
-                String.valueOf(insideBallCount),
-                String.valueOf(stoppedBallCount)};
+    public String[][] toArray() {
+        return new String[][]{{"Ball count", String.valueOf(ballCount)},
+                {"Outside ball count", String.valueOf(outsideBallCount)},
+                {"Inside ball count", String.valueOf(insideBallCount)},
+                {"Stopped ball count", String.valueOf(stoppedBallCount)}};
     }
 }
