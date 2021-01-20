@@ -3,8 +3,9 @@ package com.snebot.fbmoll.graphics;
 import java.awt.*;
 
 public class Ball extends VisibleObject implements Runnable {
-    private final Thread thread = new Thread(this, getClass().getSimpleName());
+    private Thread thread = null;
     private volatile boolean animate = false;
+    private volatile boolean paused = false;
     public BallDelegate delegate = null;
 
     public Ball() {
@@ -15,20 +16,35 @@ public class Ball extends VisibleObject implements Runnable {
      * Start ball thread.
      */
     public void start() {
-        this.thread.start();
+        if (this.thread == null) {
+            this.thread = new Thread(this, getClass().getSimpleName());
+            this.thread.start();
+        } else {
+            resume();
+        }
+    }
+
+    public void pause() {
+        this.paused = true;
+    }
+
+    public void resume() {
+        this.paused = false;
     }
 
     /**
      * Stop ball thread.
      */
     public void stop() {
+        if (this.thread == null) return;
         this.animate = false;
         try {
-            this.thread.join();
+            this.thread.join(1000);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
+        this.thread = null;
     }
 
     @Override
@@ -36,9 +52,11 @@ public class Ball extends VisibleObject implements Runnable {
         this.animate = true;
         while (this.animate && this.delegate != null) {
             try {
-                this.color = this.delegate.willTouchBlackHole(this) ? Color.BLUE : Color.red;
-                this.delegate.willBounce(this);
-                this.step();
+                if (!this.paused) {
+                    this.color = this.delegate.willTouchBlackHole(this) ? Color.BLUE : Color.red;
+                    this.delegate.willBounce(this);
+                    this.step();
+                }
                 Thread.sleep(this.delay);
             } catch (Exception e) {
                 System.out.println(e.getMessage());

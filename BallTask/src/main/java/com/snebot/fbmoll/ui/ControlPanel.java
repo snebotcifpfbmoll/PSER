@@ -1,6 +1,7 @@
 package com.snebot.fbmoll.ui;
 
 import com.snebot.fbmoll.data.Statistics;
+import org.omg.CORBA.portable.Delegate;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -15,6 +16,15 @@ public class ControlPanel extends JPanel implements Runnable {
     private final Thread thread = new Thread(this, getClass().getSimpleName());
     private Statistics statistics = new Statistics(5, 6, 7, 8);
     private DefaultTableModel model = new DefaultTableModel();
+    private ControlPanelDelegate delegate = null;
+
+    public ControlPanelDelegate getDelegate() {
+        return delegate;
+    }
+
+    public void setDelegate(ControlPanelDelegate delegate) {
+        this.delegate = delegate;
+    }
 
     private ControlPanel() {
     }
@@ -68,6 +78,15 @@ public class ControlPanel extends JPanel implements Runnable {
         add(stop, constraints);
 
         play.addActionListener(e -> {
+            if (this.delegate != null) this.delegate.didPressPlay();
+        });
+
+        pause.addActionListener(e -> {
+            if (this.delegate != null) this.delegate.didPressPause();
+        });
+
+        stop.addActionListener(e -> {
+            if (this.delegate != null) this.delegate.didPressStop();
         });
     }
 

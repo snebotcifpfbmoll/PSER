@@ -7,14 +7,16 @@ import com.snebot.fbmoll.graphics.BallDelegate;
 import com.snebot.fbmoll.graphics.BlackHole;
 import com.snebot.fbmoll.graphics.VisibleObject;
 import com.snebot.fbmoll.ui.ControlPanel;
+import com.snebot.fbmoll.ui.ControlPanelDelegate;
 import com.snebot.fbmoll.ui.Viewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-public class BallTask extends JFrame implements StatisticsDataSource, BallDelegate {
+public class BallTask extends JFrame implements StatisticsDataSource, BallDelegate, ControlPanelDelegate {
     private static final int VIEW_WIDTH = 1200;
     private static final int VIEW_HEIGHT = 600;
     private static final int MIN_BALL_COUNT = 10;
@@ -69,6 +71,7 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
         constraints.gridy = 0;
         constraints.weightx = 0.1;
         constraints.weighty = 1.0;
+        this.controlPanel.setDelegate(this);
         pane.add(this.controlPanel, constraints);
 
         constraints.gridx = 1;
@@ -88,22 +91,6 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
      */
     public int getRandom(int min, int max) {
         return (int) (Math.random() * (max - min + 1) + min);
-    }
-
-    /**
-     * Add a new ball to ball list.
-     *
-     * @param ball New ball.
-     */
-    public void addBall(Ball ball) {
-    }
-
-    /**
-     * Remove ball from ball list.
-     *
-     * @param ball Ball to remove.
-     */
-    public void removeBall(Ball ball) {
     }
 
     /**
@@ -135,33 +122,8 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
             ball.point.y = getRandom(0, this.viewer.getHeight() - ball.size.height);
             ball.deltaX = nonZeroDelta(MIN_BALL_SPEED, MAX_BALL_SPEED);
             ball.deltaY = nonZeroDelta(MIN_BALL_SPEED, MAX_BALL_SPEED);
-            ball.start();
             list.add(ball);
         }
-    }
-
-    /**
-     * Add a new black hole to black hole list.
-     *
-     * @param blackHole New black hole.
-     */
-    public void addBlackHole(BlackHole blackHole) {
-    }
-
-    /**
-     * Remove a black hole from black hole list.
-     *
-     * @param blackHole Black hole to remove.
-     */
-    public void removeBlackHole(BlackHole blackHole) {
-    }
-
-    /**
-     * Generate an amount of black holes.
-     *
-     * @param count Black hole count.
-     */
-    public void generateBlackHole(int count) {
     }
 
     @Override
@@ -191,6 +153,37 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
                 ball.deltaY = -ball.deltaY;
             }
         }
+    }
+
+    @Override
+    public void didPressPlay() {
+        this.balls.forEach(obj -> {
+            if (obj instanceof Ball) {
+                Ball ball = (Ball) obj;
+                ball.start();
+            }
+        });
+    }
+
+    @Override
+    public void didPressPause() {
+        this.balls.forEach(obj -> {
+            if (obj instanceof Ball) {
+                Ball ball = (Ball) obj;
+                ball.pause();
+            }
+        });
+    }
+
+    @Override
+    public void didPressStop() {
+        this.balls.forEach(obj -> {
+            if (obj instanceof Ball) {
+                Ball ball = (Ball) obj;
+                ball.stop();
+            }
+        });
+        for (VisibleObject obj : this.balls) this.balls.remove(obj);
     }
 
     @Override
