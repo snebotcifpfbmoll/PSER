@@ -78,15 +78,15 @@ public class ControlPanel extends JPanel implements Runnable {
         add(stop, constraints);
 
         play.addActionListener(e -> {
-            if (this.delegate != null) this.delegate.didPressPlay();
+            if (this.delegate != null) this.delegate.didPress(ControlPanelAction.PLAY);
         });
 
         pause.addActionListener(e -> {
-            if (this.delegate != null) this.delegate.didPressPause();
+            if (this.delegate != null) this.delegate.didPress(ControlPanelAction.PAUSE);
         });
 
         stop.addActionListener(e -> {
-            if (this.delegate != null) this.delegate.didPressStop();
+            if (this.delegate != null) this.delegate.didPress(ControlPanelAction.STOP);
         });
     }
 

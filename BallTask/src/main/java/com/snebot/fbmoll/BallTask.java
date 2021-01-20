@@ -6,10 +6,7 @@ import com.snebot.fbmoll.graphics.Ball;
 import com.snebot.fbmoll.graphics.BallDelegate;
 import com.snebot.fbmoll.graphics.BlackHole;
 import com.snebot.fbmoll.graphics.VisibleObject;
-import com.snebot.fbmoll.ui.ControlPanel;
-import com.snebot.fbmoll.ui.ControlPanelDelegate;
-import com.snebot.fbmoll.ui.Viewer;
-import com.snebot.fbmoll.ui.ViewerDelegate;
+import com.snebot.fbmoll.ui.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,18 +39,6 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
 
     public BallTask() {
         setupUI();
-
-        for (int i = 0; i < BLACK_HOLE_COUNT; i++) {
-            BlackHole blackHole = new BlackHole();
-            blackHole.point.x = BLACK_HOLE_COORDS[i][0];
-            blackHole.point.y = BLACK_HOLE_COORDS[i][1];
-            this.blackHoles.add(blackHole);
-        }
-
-        generateBall(this.balls, getRandom(MIN_BALL_COUNT, MAX_BALL_COUNT));
-
-        //this.viewer.setBalls(this.balls);
-        //this.viewer.setBlackHoles(this.blackHoles);
         this.viewer.start();
     }
 
@@ -82,6 +67,18 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
 
         pack();
         setVisible(true);
+    }
+
+    /**
+     * Setup black holes in a predetermined configuration.
+     */
+    void setupBlackHoles() {
+        for (int i = 0; i < BLACK_HOLE_COUNT; i++) {
+            BlackHole blackHole = new BlackHole();
+            blackHole.point.x = BLACK_HOLE_COORDS[i][0];
+            blackHole.point.y = BLACK_HOLE_COORDS[i][1];
+            this.blackHoles.add(blackHole);
+        }
     }
 
     /**
@@ -163,34 +160,22 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
     }
 
     @Override
-    public void didPressPlay() {
-        this.balls.forEach(obj -> {
-            if (obj instanceof Ball) {
-                Ball ball = (Ball) obj;
-                ball.start();
-            }
-        });
-    }
-
-    @Override
-    public void didPressPause() {
-        this.balls.forEach(obj -> {
-            if (obj instanceof Ball) {
-                Ball ball = (Ball) obj;
-                ball.pause();
-            }
-        });
-    }
-
-    @Override
-    public void didPressStop() {
-        this.balls.forEach(obj -> {
-            if (obj instanceof Ball) {
-                Ball ball = (Ball) obj;
-                ball.stop();
-            }
-        });
-        this.balls.clear();
+    public void didPress(ControlPanelAction action) {
+        switch (action) {
+            case PLAY:
+                if (this.blackHoles.isEmpty()) setupBlackHoles();
+                if (this.balls.isEmpty()) generateBall(this.balls, getRandom(MIN_BALL_COUNT, MAX_BALL_COUNT));
+                this.balls.forEach(VisibleObject::start);
+                break;
+            case PAUSE:
+                this.balls.forEach(VisibleObject::pause);
+                break;
+            case STOP:
+                this.balls.forEach(VisibleObject::stop);
+                this.blackHoles.clear();
+                this.balls.clear();
+                break;
+        }
     }
 
     @Override

@@ -6,7 +6,6 @@ import java.util.List;
 
 public class BlackHole extends VisibleObject implements Runnable {
     private static final int MAX_BALL_COUNT = 1;
-    private final Thread thread = new Thread(this, getClass().getSimpleName());
     private final List<Ball> balls = new ArrayList<>();
 
     public BlackHole() {
@@ -45,6 +44,14 @@ public class BlackHole extends VisibleObject implements Runnable {
     }
 
     /**
+     * Remove all balls that are crossing the black hole.
+     */
+    public synchronized void removeAll() {
+        this.balls.clear();
+        notifyAll();
+    }
+
+    /**
      * Check if ball is inside black hole.
      *
      * @param ball Ball to check.
@@ -53,13 +60,6 @@ public class BlackHole extends VisibleObject implements Runnable {
     public boolean checkBall(Ball ball) {
         for (Ball item : this.balls) if (ball.equals(item)) return true;
         return false;
-    }
-
-    /**
-     * Start black hole thread.
-     */
-    public void start() {
-        this.thread.start();
     }
 
     @Override
