@@ -1,42 +1,10 @@
 package com.snebot.fbmoll.data;
 
 public class Statistics {
-    private int ballCount = 0;
-    private int outsideBallCount = 0;
-    private int insideBallCount = 0;
-    private int stoppedBallCount = 0;
-
-    public int getBallCount() {
-        return ballCount;
-    }
-
-    public void setBallCount(int ballCount) {
-        this.ballCount = ballCount;
-    }
-
-    public int getOutsideBallCount() {
-        return outsideBallCount;
-    }
-
-    public void setOutsideBallCount(int outsideBallCount) {
-        this.outsideBallCount = outsideBallCount;
-    }
-
-    public int getInsideBallCount() {
-        return insideBallCount;
-    }
-
-    public void setInsideBallCount(int insideBallCount) {
-        this.insideBallCount = insideBallCount;
-    }
-
-    public int getStoppedBallCount() {
-        return stoppedBallCount;
-    }
-
-    public void setStoppedBallCount(int stoppedBallCount) {
-        this.stoppedBallCount = stoppedBallCount;
-    }
+    public int ballCount = 0;
+    public int outsideBallCount = 0;
+    public int insideBallCount = 0;
+    public int stoppedBallCount = 0;
 
     public Statistics() {
     }

@@ -62,6 +62,15 @@ public class BlackHole extends VisibleObject implements Runnable {
         return false;
     }
 
+    /**
+     * Get amount of balls inside black hole.
+     *
+     * @return Ball count.
+     */
+    public int ballCount() {
+        return this.balls.size();
+    }
+
     @Override
     public void run() {
     }

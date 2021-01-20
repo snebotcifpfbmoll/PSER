@@ -1,7 +1,6 @@
 package com.snebot.fbmoll;
 
 import com.snebot.fbmoll.data.Statistics;
-import com.snebot.fbmoll.data.StatisticsDataSource;
 import com.snebot.fbmoll.graphics.Ball;
 import com.snebot.fbmoll.graphics.BallDelegate;
 import com.snebot.fbmoll.graphics.BlackHole;
@@ -15,13 +14,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class BallTask extends JFrame implements StatisticsDataSource, BallDelegate, ControlPanelDelegate, ViewerDelegate {
+public class BallTask extends JFrame implements BallDelegate, ControlPanelDelegate, ViewerDelegate {
     private static final int VIEW_WIDTH = 1200;
     private static final int VIEW_HEIGHT = 600;
     private static final int MIN_BALL_COUNT = 10;
     private static final int MAX_BALL_COUNT = 15;
-    private static final int MIN_BALL_SPEED = -5;
-    private static final int MAX_BALL_SPEED = 5;
+    private static final int BALL_SPEED = 10;
+    private static final int MIN_BALL_SPEED = -BALL_SPEED;
+    private static final int MAX_BALL_SPEED = BALL_SPEED;
     private static final int BLACK_HOLE_COUNT = 2;
     private static final int[][] BLACK_HOLE_COORDS = new int[BLACK_HOLE_COUNT][2];
 
@@ -132,7 +132,16 @@ public class BallTask extends JFrame implements StatisticsDataSource, BallDelega
 
     @Override
     public Statistics getStatistics() {
-        return new Statistics(5, 6, 7, 8);
+        Statistics stats = new Statistics();
+        stats.ballCount = this.balls.size();
+        this.blackHoles.forEach(obj -> {
+            if (obj instanceof BlackHole) {
+                BlackHole hole = (BlackHole) obj;
+                stats.insideBallCount = hole.ballCount();
+            }
+        });
+        stats.outsideBallCount = stats.ballCount - stats.insideBallCount;
+        return stats;
     }
 
     @Override
