@@ -66,10 +66,25 @@ public abstract class VisibleObject implements Runnable {
         return inBounds(object.point.x, object.point.y, object.size.width, object.size.height);
     }
 
+    /**
+     * Determine if an object intersects with an other.
+     *
+     * @param object VisibleObject to check intersection.
+     * @return True on intersection, false otherwise.
+     */
     public boolean intersects(VisibleObject object) {
         return intersects(object.point.x, object.point.y, object.size.width, object.size.height);
     }
 
+    /**
+     * Determine if an object intersects with a rect.
+     *
+     * @param x X position of rect.
+     * @param y Y position of rect.
+     * @param width Width of rect.
+     * @param height Height of rect.
+     * @return True on intersection, false otherwise.
+     */
     public boolean intersects(int x, int y, int width, int height) {
         int tw = this.size.width;
         int th = this.size.height;

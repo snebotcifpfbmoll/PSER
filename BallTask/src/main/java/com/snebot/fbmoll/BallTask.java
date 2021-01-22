@@ -165,6 +165,7 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
         switch (detectWall(ball)) {
             case TOP:
                 System.out.println("top");
+                ball.pause();
                 break;
             case RIGHT:
                 System.out.println("right");
