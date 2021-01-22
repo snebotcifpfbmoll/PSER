@@ -1,10 +1,7 @@
 package com.snebot.fbmoll;
 
 import com.snebot.fbmoll.data.Statistics;
-import com.snebot.fbmoll.graphics.Ball;
-import com.snebot.fbmoll.graphics.BallDelegate;
-import com.snebot.fbmoll.graphics.BlackHole;
-import com.snebot.fbmoll.graphics.VisibleObject;
+import com.snebot.fbmoll.graphics.*;
 import com.snebot.fbmoll.ui.*;
 
 import javax.swing.*;
@@ -17,8 +14,8 @@ import java.util.stream.Stream;
 public class BallTask extends JFrame implements BallDelegate, ControlPanelDelegate, ViewerDelegate {
     private static final int VIEW_WIDTH = 1200;
     private static final int VIEW_HEIGHT = 600;
-    private static final int MIN_BALL_COUNT = 20;
-    private static final int MAX_BALL_COUNT = 20;
+    private static final int MIN_BALL_COUNT = 1;
+    private static final int MAX_BALL_COUNT = 1;
     private static final int BALL_SPEED = 5;
     private static final int MIN_BALL_SPEED = -BALL_SPEED;
     private static final int MAX_BALL_SPEED = BALL_SPEED;
@@ -36,7 +33,6 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     private final ControlPanel controlPanel = new ControlPanel(150, VIEW_HEIGHT);
     private final List<VisibleObject> balls = new ArrayList<>();
     private final List<VisibleObject> blackHoles = new ArrayList<>();
-    private final Statistics statistics = new Statistics();
 
     public BallTask() {
         setupUI();
@@ -154,10 +150,9 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     @Override
     public boolean willTouchBlackHole(Ball ball) {
         boolean touch = false;
-        BlackHole blackHole = null;
         for (int i = 0; i < this.blackHoles.size() && !touch; i++) {
-            blackHole = (BlackHole) this.blackHoles.get(i);
-            touch = ball.touches(blackHole);
+            BlackHole blackHole = (BlackHole) this.blackHoles.get(i);
+            touch = ball.intersects(blackHole);
             boolean inside = blackHole.checkBall(ball);
             if (touch) blackHole.put(ball);
             if (!touch && inside) blackHole.remove(ball);
@@ -167,13 +162,41 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
 
     @Override
     public void willBounce(Ball ball) {
-        if (!ball.inBounds(0, 0, this.viewer.getWidth() - ball.size.width, this.viewer.getHeight() - ball.size.height)) {
-            if ((ball.deltaX > 0 && ball.deltaY > 0) || (ball.deltaX < 0 && ball.deltaY < 0)) {
-                ball.deltaX = -ball.deltaX;
-            } else if ((ball.deltaX > 0 && ball.deltaY < 0) || (ball.deltaX < 0 && ball.deltaY > 0)) {
-                ball.deltaY = -ball.deltaY;
-            }
+        switch (detectWall(ball)) {
+            case TOP:
+                System.out.println("top");
+                break;
+            case RIGHT:
+                System.out.println("right");
+                break;
+            case BOTTOM:
+                System.out.println("bottom");
+                break;
+            case LEFT:
+                System.out.println("left");
+                break;
+            case NONE:
+                return;
         }
+
+        if ((ball.deltaX < 0 && ball.deltaY < 0) || (ball.deltaX > 0 && ball.deltaY > 0)) {
+            ball.deltaX = -ball.deltaX;
+        } else if ((ball.deltaX > 0 && ball.deltaY < 0) || (ball.deltaX < 0 && ball.deltaY > 0)) {
+            ball.deltaY = -ball.deltaY;
+        }
+    }
+
+    public WallPosition detectWall(Ball ball) {
+        if (ball.intersects(0, 0, this.viewer.getWidth(), 1)) {
+            return WallPosition.TOP;
+        } else if (ball.intersects(0, this.viewer.getHeight(), this.viewer.getWidth(), 1)) {
+            return WallPosition.BOTTOM;
+        } else if (ball.intersects(0, 0, 1, this.viewer.getHeight())) {
+            return WallPosition.LEFT;
+        } else if (ball.intersects(this.viewer.getWidth(), 0, 1, this.viewer.getHeight())) {
+            return WallPosition.RIGHT;
+        }
+        return WallPosition.NONE;
     }
 
     public void play() {

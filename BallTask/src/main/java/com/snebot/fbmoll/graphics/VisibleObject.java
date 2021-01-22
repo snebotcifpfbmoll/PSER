@@ -29,6 +29,14 @@ public abstract class VisibleObject implements Runnable {
         this.color = color;
     }
 
+    public VisibleObject() {
+    }
+
+    public VisibleObject(int width, int height) {
+        this.size.width = width;
+        this.size.height = height;
+    }
+
     /**
      * Change current object position by current delta.
      */
@@ -56,6 +64,28 @@ public abstract class VisibleObject implements Runnable {
      */
     public boolean touches(VisibleObject object) {
         return inBounds(object.point.x, object.point.y, object.size.width, object.size.height);
+    }
+
+    public boolean intersects(VisibleObject object) {
+        return intersects(object.point.x, object.point.y, object.size.width, object.size.height);
+    }
+
+    public boolean intersects(int x, int y, int width, int height) {
+        int tw = this.size.width;
+        int th = this.size.height;
+        int rw = width;
+        int rh = height;
+        if (rw <= 0 || rh <= 0 || tw <= 0 || th <= 0) return false;
+        int tx = this.point.x;
+        int ty = this.point.y;
+        rw += x;
+        rh += y;
+        tw += tx;
+        th += ty;
+        return ((rw < x || rw > tx) &&
+                (rh < y || rh > ty) &&
+                (tw < tx || tw > x) &&
+                (th < ty || th > y));
     }
 
     /**

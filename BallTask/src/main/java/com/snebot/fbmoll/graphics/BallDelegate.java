@@ -9,12 +9,6 @@ public interface BallDelegate {
      */
     boolean willTouchBlackHole(Ball ball);
     /**
-     * Determine if a given ball can move to its next position.
-     *
-     * @param ball Ball to test.
-     * @return True if the ball can move, false otherwise.
-     */
-    /**
      * Determine if a given ball will bounce.
      *
      * @param ball Ball to check.
