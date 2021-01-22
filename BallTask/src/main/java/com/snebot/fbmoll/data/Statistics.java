@@ -16,6 +16,13 @@ public class Statistics {
         this.stoppedBallCount = stoppedBallCount;
     }
 
+    public void clear() {
+        this.ballCount = 0;
+        this.outsideBallCount = 0;
+        this.insideBallCount = 0;
+        this.stoppedBallCount = 0;
+    }
+
     public String[][] toArray() {
         return new String[][]{{"Ball count", String.valueOf(ballCount)},
                 {"Outside ball count", String.valueOf(outsideBallCount)},

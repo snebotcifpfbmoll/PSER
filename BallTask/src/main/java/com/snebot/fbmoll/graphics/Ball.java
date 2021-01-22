@@ -5,6 +5,7 @@ import java.awt.*;
 public class Ball extends VisibleObject implements Runnable {
     private Thread thread = null;
     public BallDelegate delegate = null;
+    public boolean stopped = false;
 
     public Ball() {
         this.delay = 10;

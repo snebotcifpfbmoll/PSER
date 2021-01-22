@@ -21,6 +21,7 @@ public class BlackHole extends VisibleObject implements Runnable {
      */
     public synchronized void put(Ball ball) {
         if (checkBall(ball)) return;
+        ball.stopped = true;
         while (balls.size() >= MAX_BALL_COUNT) {
             try {
                 wait();
@@ -29,6 +30,7 @@ public class BlackHole extends VisibleObject implements Runnable {
                 e.printStackTrace();
             }
         }
+        ball.stopped = false;
         this.balls.add(ball);
         notifyAll();
     }

@@ -3,19 +3,27 @@ package com.snebot.fbmoll.ui;
 import com.snebot.fbmoll.data.Statistics;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class ControlPanel extends JPanel implements Runnable {
     private int vWidth = 1;
     private int vHeight = 1;
+    public boolean run = true;
     public boolean update = true;
     private int delay = 40;
 
     private static final int SMALL_INSET = 5;
+    private static final String BALL_COUNT_FORMAT = "Ball count: \t%d";
+    private static final String OUTSIDE_BALL_COUNT_FORMAT = "Outside ball count: \t%d";
+    private static final String INSIDE_BALL_COUNT_FORMAT = "Inside count: \t%d";
+    private static final String STOPPED_BALL_COUNT_FORMAT = "Stopped ball count: \t%d";
+
+    private final JLabel ballCountLabel = new JLabel(String.format(BALL_COUNT_FORMAT, 0));
+    private final JLabel outsideBallCountLabel = new JLabel(String.format(OUTSIDE_BALL_COUNT_FORMAT, 0));
+    private final JLabel insideBallCountLabel = new JLabel(String.format(INSIDE_BALL_COUNT_FORMAT, 0));
+    private final JLabel stoppedBallCountLabel = new JLabel(String.format(STOPPED_BALL_COUNT_FORMAT, 0));
 
     private final Thread thread = new Thread(this, getClass().getSimpleName());
-    private final JTable table = new JTable();
     private Statistics statistics = new Statistics();
     private ControlPanelDelegate delegate = null;
 
@@ -35,7 +43,7 @@ public class ControlPanel extends JPanel implements Runnable {
         this.vWidth = width;
         this.vHeight = height;
         setup();
-        //this.thread.start();
+        this.thread.start();
     }
 
     private void setup() {
@@ -50,14 +58,23 @@ public class ControlPanel extends JPanel implements Runnable {
         constraints.weightx = 0.1;
         constraints.weighty = 0.1;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.insets = new Insets(SMALL_INSET, SMALL_INSET, SMALL_INSET, SMALL_INSET);
+        constraints.insets = new Insets(SMALL_INSET, SMALL_INSET, 0, SMALL_INSET);
         constraints.anchor = GridBagConstraints.PAGE_START;
 
-        JScrollPane scroll = new JScrollPane(this.table);
-        scroll.setMinimumSize(new Dimension(100, 100));
-        scroll.setMaximumSize(new Dimension(150, 200));
-        add(scroll, constraints);
-        updateTable();
+        add(this.ballCountLabel, constraints);
+        ylevel += 1;
+        constraints.gridy = ylevel;
+        constraints.insets = new Insets(0, SMALL_INSET, 0, SMALL_INSET);
+        add(this.outsideBallCountLabel, constraints);
+        ylevel += 1;
+        constraints.gridy = ylevel;
+        add(this.insideBallCountLabel, constraints);
+        ylevel += 1;
+        constraints.gridy = ylevel;
+        add(this.stoppedBallCountLabel, constraints);
+        ylevel += 1;
+        constraints.gridy = ylevel;
+        constraints.insets = new Insets(SMALL_INSET, SMALL_INSET, SMALL_INSET, SMALL_INSET);
 
         constraints.gridwidth = 1;
         ylevel += constraints.gridheight;
@@ -78,6 +95,11 @@ public class ControlPanel extends JPanel implements Runnable {
         JButton stop = new JButton("Stop");
         add(stop, constraints);
 
+        constraints.gridx = 1;
+
+        JButton restart = new JButton("Restart");
+        add(restart, constraints);
+
         play.addActionListener(e -> {
             if (this.delegate != null) this.delegate.didPress(ControlPanelAction.PLAY);
         });
@@ -89,24 +111,26 @@ public class ControlPanel extends JPanel implements Runnable {
         stop.addActionListener(e -> {
             if (this.delegate != null) this.delegate.didPress(ControlPanelAction.STOP);
         });
+
+        restart.addActionListener(e -> {
+            if (this.delegate != null) this.delegate.didPress(ControlPanelAction.RESTART);
+        });
     }
 
-    public void updateTable() {
-        if (this.statistics == null) return;
-        String[][] data = this.statistics.toArray();
-        String[] columns = new String[]{"Name", "Count"};
-        DefaultTableModel model = new DefaultTableModel(data, columns);
-        this.table.setModel(model);
+    public void updateStatistics() {
+        if (this.statistics == null || this.delegate == null) return;
+        this.statistics = this.delegate.getStatistics();
+        this.ballCountLabel.setText(String.format(BALL_COUNT_FORMAT, this.statistics.ballCount));
+        this.outsideBallCountLabel.setText(String.format(OUTSIDE_BALL_COUNT_FORMAT, this.statistics.outsideBallCount));
+        this.insideBallCountLabel.setText(String.format(INSIDE_BALL_COUNT_FORMAT, this.statistics.insideBallCount));
+        this.stoppedBallCountLabel.setText(String.format(STOPPED_BALL_COUNT_FORMAT, this.statistics.stoppedBallCount));
     }
 
     @Override
     public void run() {
-        while (this.update) {
+        while (this.run) {
             try {
-                if (this.delegate != null) {
-                    this.statistics = this.delegate.getStatistics();
-                    updateTable();
-                }
+                if (this.update) updateStatistics();
                 Thread.sleep(this.delay);
             } catch (Exception e) {
                 System.out.println(e.getMessage());

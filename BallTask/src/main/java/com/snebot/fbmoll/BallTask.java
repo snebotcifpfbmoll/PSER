@@ -17,9 +17,9 @@ import java.util.stream.Stream;
 public class BallTask extends JFrame implements BallDelegate, ControlPanelDelegate, ViewerDelegate {
     private static final int VIEW_WIDTH = 1200;
     private static final int VIEW_HEIGHT = 600;
-    private static final int MIN_BALL_COUNT = 10;
-    private static final int MAX_BALL_COUNT = 15;
-    private static final int BALL_SPEED = 10;
+    private static final int MIN_BALL_COUNT = 20;
+    private static final int MAX_BALL_COUNT = 20;
+    private static final int BALL_SPEED = 5;
     private static final int MIN_BALL_SPEED = -BALL_SPEED;
     private static final int MAX_BALL_SPEED = BALL_SPEED;
     private static final int BLACK_HOLE_COUNT = 2;
@@ -36,6 +36,7 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     private final ControlPanel controlPanel = new ControlPanel(150, VIEW_HEIGHT);
     private final List<VisibleObject> balls = new ArrayList<>();
     private final List<VisibleObject> blackHoles = new ArrayList<>();
+    private final Statistics statistics = new Statistics();
 
     public BallTask() {
         setupUI();
@@ -137,10 +138,16 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
         this.blackHoles.forEach(obj -> {
             if (obj instanceof BlackHole) {
                 BlackHole hole = (BlackHole) obj;
-                stats.insideBallCount = hole.ballCount();
+                stats.insideBallCount += hole.ballCount();
             }
         });
         stats.outsideBallCount = stats.ballCount - stats.insideBallCount;
+        for (VisibleObject obj : this.balls) {
+            if (obj instanceof Ball) {
+                Ball ball = (Ball) obj;
+                if (ball.stopped) stats.stoppedBallCount += 1;
+            }
+        }
         return stats;
     }
 
@@ -151,8 +158,9 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
         for (int i = 0; i < this.blackHoles.size() && !touch; i++) {
             blackHole = (BlackHole) this.blackHoles.get(i);
             touch = ball.touches(blackHole);
+            boolean inside = blackHole.checkBall(ball);
             if (touch) blackHole.put(ball);
-            if (!touch && blackHole.checkBall(ball)) blackHole.remove(ball);
+            if (!touch && inside) blackHole.remove(ball);
         }
         return touch;
     }
@@ -168,21 +176,41 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
         }
     }
 
+    public void play() {
+        if (this.blackHoles.isEmpty()) setupBlackHoles();
+        if (this.balls.isEmpty()) generateBall(this.balls, getRandom(MIN_BALL_COUNT, MAX_BALL_COUNT));
+        this.balls.forEach(VisibleObject::start);
+        this.controlPanel.update = true;
+    }
+
+    public void pause() {
+        this.balls.forEach(VisibleObject::pause);
+        this.controlPanel.update = false;
+    }
+
+    public void stop() {
+        this.balls.forEach(VisibleObject::stop);
+        this.blackHoles.clear();
+        this.balls.clear();
+        this.controlPanel.update = false;
+        this.controlPanel.updateStatistics();
+    }
+
     @Override
     public void didPress(ControlPanelAction action) {
         switch (action) {
             case PLAY:
-                if (this.blackHoles.isEmpty()) setupBlackHoles();
-                if (this.balls.isEmpty()) generateBall(this.balls, getRandom(MIN_BALL_COUNT, MAX_BALL_COUNT));
-                this.balls.forEach(VisibleObject::start);
+                play();
                 break;
             case PAUSE:
-                this.balls.forEach(VisibleObject::pause);
+                pause();
                 break;
             case STOP:
-                this.balls.forEach(VisibleObject::stop);
-                this.blackHoles.clear();
-                this.balls.clear();
+                stop();
+                break;
+            case RESTART:
+                stop();
+                play();
                 break;
         }
     }
