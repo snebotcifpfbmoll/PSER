@@ -11,14 +11,30 @@ public class Ball extends VisibleObject {
         this.delay = 10;
     }
 
+    public void bounce(WallPosition position) {
+        switch (position) {
+            case TOP:
+            case BOTTOM:
+                this.deltaY = -this.deltaY;
+                break;
+            case RIGHT:
+            case LEFT:
+                this.deltaX = -this.deltaX;
+                break;
+            case NONE:
+                break;
+        }
+    }
+
     @Override
     public void run() {
         this.run = true;
         while (this.run && this.delegate != null) {
             try {
                 if (!this.paused) {
-                    this.color = this.delegate.willTouchBlackHole(this) ? Color.BLUE : Color.red;
-                    this.delegate.willBounce(this);
+                    //this.color = this.delegate.willTouchBlackHole(this) ? Color.BLUE : Color.red;
+                    //this.delegate.willBounce(this);
+                    this.delegate.canMove(this);
                     this.step();
                 }
                 Thread.sleep(this.delay);

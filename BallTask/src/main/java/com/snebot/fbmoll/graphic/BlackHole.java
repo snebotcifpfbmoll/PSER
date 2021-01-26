@@ -9,8 +9,8 @@ public class BlackHole extends VisibleObject {
     private final List<Ball> balls = new ArrayList<>();
 
     public BlackHole() {
-        this.size.width = 200;
-        this.size.height = 100;
+        this.size.width = 150;
+        this.size.height = 400;
         this.color = Color.BLACK;
     }
 

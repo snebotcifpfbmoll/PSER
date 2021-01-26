@@ -6,7 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerConnection extends ThreadedObject {
-    private static final int PORT = 42069;
+    private static final int PORT = 3411;
 
     @Override
     public void run() {
@@ -15,6 +15,7 @@ public class ServerConnection extends ThreadedObject {
         try {
             serverSocket = new ServerSocket(PORT);
             while (this.run) {
+                System.out.println("Listening on port: " + PORT);
                 clientSocket = serverSocket.accept();
                 String clientAddress = clientSocket.getInetAddress().getHostAddress();
                 System.out.println("New connection from: " + clientAddress);

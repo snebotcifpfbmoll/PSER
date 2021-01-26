@@ -11,6 +11,7 @@ public abstract class ThreadedObject implements Runnable {
     public void start() {
         if (this.thread == null) {
             this.thread = new Thread(this, getClass().getSimpleName());
+            this.run = true;
             this.thread.start();
         } else {
             resume();
@@ -29,6 +30,17 @@ public abstract class ThreadedObject implements Runnable {
      */
     public void resume() {
         this.paused = false;
+    }
+
+    public boolean join(int millis) {
+        try {
+            this.thread.join(millis);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     /**

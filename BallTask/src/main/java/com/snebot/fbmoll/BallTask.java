@@ -24,8 +24,8 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     private static final int[][] BLACK_HOLE_COORDS = new int[BLACK_HOLE_COUNT][2];
 
     static {
-        BLACK_HOLE_COORDS[0][0] = 200;
-        BLACK_HOLE_COORDS[0][1] = 100;
+        BLACK_HOLE_COORDS[0][0] = 100;
+        BLACK_HOLE_COORDS[0][1] = 0;
         BLACK_HOLE_COORDS[1][0] = 800;
         BLACK_HOLE_COORDS[1][1] = 300;
     }
@@ -137,7 +137,6 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
         return stats;
     }
 
-    @Override
     public boolean willTouchBlackHole(Ball ball) {
         boolean touch = false;
         for (int i = 0; i < this.blackHoles.size() && !touch; i++) {
@@ -151,29 +150,19 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     }
 
     @Override
-    public void willBounce(Ball ball) {
-        switch (detectWall(ball)) {
-            case TOP:
-                //System.out.println("top");
-                break;
-            case RIGHT:
-                //System.out.println("right");
-                break;
-            case BOTTOM:
-                //System.out.println("bottom");
-                break;
-            case LEFT:
-                //System.out.println("left");
-                break;
-            case NONE:
-                return;
+    public boolean canMove(Ball ball) {
+        boolean move = false;
+        boolean inside = false;
+        for (int i = 0; i < this.blackHoles.size() && !move; i++) {
+            BlackHole blackHole = (BlackHole) this.blackHoles.get(i);
+            move = ball.intersects(blackHole);
+            inside = blackHole.checkBall(ball);
+            if (move) blackHole.put(ball);
+            if (!move && inside) blackHole.remove(ball);
         }
-
-        if ((ball.deltaX < 0 && ball.deltaY < 0) || (ball.deltaX > 0 && ball.deltaY > 0)) {
-            ball.deltaX = -ball.deltaX;
-        } else if ((ball.deltaX > 0 && ball.deltaY < 0) || (ball.deltaX < 0 && ball.deltaY > 0)) {
-            ball.deltaY = -ball.deltaY;
-        }
+        ball.setColor(inside ? Color.BLUE : Color.RED);
+        ball.bounce(detectWall(ball));
+        return move;
     }
 
     public WallPosition detectWall(Ball ball) {
