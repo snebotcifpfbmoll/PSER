@@ -1,21 +1,20 @@
-package com.snebot.fbmoll.graphics;
+package com.snebot.fbmoll.graphic;
 
 import java.awt.*;
 
-public class Ball extends VisibleObject implements Runnable {
+public class Ball extends VisibleObject {
     private Thread thread = null;
     public BallDelegate delegate = null;
-    public boolean stopped = false;
+    public volatile boolean stopped = false;
 
     public Ball() {
         this.delay = 10;
     }
 
-
     @Override
     public void run() {
-        this.animate = true;
-        while (this.animate && this.delegate != null) {
+        this.run = true;
+        while (this.run && this.delegate != null) {
             try {
                 if (!this.paused) {
                     this.color = this.delegate.willTouchBlackHole(this) ? Color.BLUE : Color.red;

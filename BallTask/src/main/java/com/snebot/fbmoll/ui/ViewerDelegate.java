@@ -1,6 +1,6 @@
 package com.snebot.fbmoll.ui;
 
-import com.snebot.fbmoll.graphics.VisibleObject;
+import com.snebot.fbmoll.graphic.VisibleObject;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.snebot.fbmoll.graphics;
+package com.snebot.fbmoll.graphic;
 
 public interface BallDelegate {
     /**

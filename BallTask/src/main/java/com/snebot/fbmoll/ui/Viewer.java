@@ -1,10 +1,7 @@
 package com.snebot.fbmoll.ui;
 
-import com.snebot.fbmoll.graphics.VisibleObject;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 public class Viewer extends JComponent implements Runnable {
     private final Thread thread = new Thread(this, getClass().getSimpleName());

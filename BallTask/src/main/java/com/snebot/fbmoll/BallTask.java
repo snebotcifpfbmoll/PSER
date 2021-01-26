@@ -1,7 +1,8 @@
 package com.snebot.fbmoll;
 
 import com.snebot.fbmoll.data.Statistics;
-import com.snebot.fbmoll.graphics.*;
+import com.snebot.fbmoll.graphic.*;
+import com.snebot.fbmoll.helper.BallTaskHelper;
 import com.snebot.fbmoll.ui.*;
 
 import javax.swing.*;
@@ -14,8 +15,8 @@ import java.util.stream.Stream;
 public class BallTask extends JFrame implements BallDelegate, ControlPanelDelegate, ViewerDelegate {
     private static final int VIEW_WIDTH = 1200;
     private static final int VIEW_HEIGHT = 600;
-    private static final int MIN_BALL_COUNT = 1;
-    private static final int MAX_BALL_COUNT = 1;
+    private static final int MIN_BALL_COUNT = 15;
+    private static final int MAX_BALL_COUNT = 20;
     private static final int BALL_SPEED = 5;
     private static final int MIN_BALL_SPEED = -BALL_SPEED;
     private static final int MAX_BALL_SPEED = BALL_SPEED;
@@ -79,17 +80,6 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     }
 
     /**
-     * Generate random number with range.
-     *
-     * @param min Minimum range.
-     * @param max Maximum range.
-     * @return Random number.
-     */
-    public int getRandom(int min, int max) {
-        return (int) (Math.random() * (max - min + 1) + min);
-    }
-
-    /**
      * Generate a random delta within range that's non zero.
      *
      * @param min Minimum value.
@@ -99,7 +89,7 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     public int nonZeroDelta(int min, int max) {
         int result = 0;
         do {
-            result = getRandom(min, max);
+            result = BallTaskHelper.random(min, max);
         } while (result == 0);
         return result;
     }
@@ -114,8 +104,8 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
         for (int i = 0; i < count; i++) {
             Ball ball = new Ball();
             ball.delegate = this;
-            ball.point.x = getRandom(0, this.viewer.getWidth() - ball.size.width);
-            ball.point.y = getRandom(0, this.viewer.getHeight() - ball.size.height);
+            ball.point.x = BallTaskHelper.random(0, this.viewer.getWidth() - ball.size.width);
+            ball.point.y = BallTaskHelper.random(0, this.viewer.getHeight() - ball.size.height);
             ball.deltaX = nonZeroDelta(MIN_BALL_SPEED, MAX_BALL_SPEED);
             ball.deltaY = nonZeroDelta(MIN_BALL_SPEED, MAX_BALL_SPEED);
             list.add(ball);
@@ -164,17 +154,16 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     public void willBounce(Ball ball) {
         switch (detectWall(ball)) {
             case TOP:
-                System.out.println("top");
-                ball.pause();
+                //System.out.println("top");
                 break;
             case RIGHT:
-                System.out.println("right");
+                //System.out.println("right");
                 break;
             case BOTTOM:
-                System.out.println("bottom");
+                //System.out.println("bottom");
                 break;
             case LEFT:
-                System.out.println("left");
+                //System.out.println("left");
                 break;
             case NONE:
                 return;
@@ -202,7 +191,7 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
 
     public void play() {
         if (this.blackHoles.isEmpty()) setupBlackHoles();
-        if (this.balls.isEmpty()) generateBall(this.balls, getRandom(MIN_BALL_COUNT, MAX_BALL_COUNT));
+        if (this.balls.isEmpty()) generateBall(this.balls, BallTaskHelper.random(MIN_BALL_COUNT, MAX_BALL_COUNT));
         this.balls.forEach(VisibleObject::start);
         this.controlPanel.update = true;
     }

@@ -1,10 +1,10 @@
-package com.snebot.fbmoll.graphics;
+package com.snebot.fbmoll.graphic;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BlackHole extends VisibleObject implements Runnable {
+public class BlackHole extends VisibleObject {
     private static final int MAX_BALL_COUNT = 1;
     private final List<Ball> balls = new ArrayList<>();
 

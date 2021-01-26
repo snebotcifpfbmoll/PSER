@@ -1,17 +1,16 @@
-package com.snebot.fbmoll.graphics;
+package com.snebot.fbmoll.graphic;
+
+import com.snebot.fbmoll.thread.ThreadedObject;
 
 import java.awt.*;
 
-public abstract class VisibleObject implements Runnable {
-    private Thread thread = null;
+public abstract class VisibleObject extends ThreadedObject {
     public Point point = new Point(0, 0);
     public Dimension size = new Dimension(40, 40);
     public int deltaX = 1;
     public int deltaY = 1;
     protected int delay = 20;
     protected Color color = Color.RED;
-    protected volatile boolean animate = false;
-    protected volatile boolean paused = false;
 
     public int getDelay() {
         return delay;
@@ -125,38 +124,4 @@ public abstract class VisibleObject implements Runnable {
      * @param g Graphics context.
      */
     public abstract void paint(Graphics g);
-
-    /**
-     * Start thread.
-     */
-    public void start() {
-        if (this.thread == null) {
-            this.thread = new Thread(this, getClass().getSimpleName());
-            this.thread.start();
-        } else {
-            resume();
-        }
-    }
-
-    /**
-     * Pause animation.
-     */
-    public void pause() {
-        this.paused = true;
-    }
-
-    /**
-     * Resume animation.
-     */
-    public void resume() {
-        this.paused = false;
-    }
-
-    /**
-     * Stop thread.
-     */
-    public void stop() {
-        this.animate = false;
-        this.thread = null;
-    }
 }
