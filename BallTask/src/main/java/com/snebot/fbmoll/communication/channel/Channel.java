@@ -13,8 +13,10 @@ public class Channel extends ThreadedObject {
     private static final String BALL_TASK_GREETING = "BallTask";
     private static final Logger log = LoggerFactory.getLogger(Channel.class);
     private Socket socket = null;
+    private ChannelDelegate delegate = null;
 
-    public Channel() {
+    public Channel(ChannelDelegate delegate) {
+        this.delegate = delegate;
         start();
     }
 
@@ -62,7 +64,7 @@ public class Channel extends ThreadedObject {
                         if (BALL_TASK_GREETING.equals(packet.getGreeting())) {
                             log.info("received greeting msg");
                         } else {
-                            System.out.println(packet.getBall());
+                            if (this.delegate != null) this.delegate.didReceiveBall(packet.getBall(), packet.position);
                         }
                     }
                 }

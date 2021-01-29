@@ -1,6 +1,7 @@
 package com.snebot.fbmoll;
 
 import com.snebot.fbmoll.communication.channel.Channel;
+import com.snebot.fbmoll.communication.channel.ChannelDelegate;
 import com.snebot.fbmoll.communication.connection.ClientConnection;
 import com.snebot.fbmoll.communication.connection.ServerConnection;
 import com.snebot.fbmoll.communication.data.Packet;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class BallTask extends JFrame implements BallDelegate, ControlPanelDelegate, ViewerDelegate {
+public class BallTask extends JFrame implements BallDelegate, ControlPanelDelegate, ViewerDelegate, ChannelDelegate {
     private static final int VIEW_WIDTH = 1200;
     private static final int VIEW_HEIGHT = 600;
     private static final int MIN_BALL_COUNT = 1;
@@ -26,7 +27,6 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     private static final int MAX_BALL_SPEED = BALL_SPEED;
     private static final int BLACK_HOLE_COUNT = 2;
     private static final int[][] BLACK_HOLE_COORDS = new int[BLACK_HOLE_COUNT][2];
-
 
     static {
         BLACK_HOLE_COORDS[0][0] = 100;
@@ -39,9 +39,18 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     private final ControlPanel controlPanel = new ControlPanel(150, VIEW_HEIGHT);
     private final List<VisibleObject> balls = new ArrayList<>();
     private final List<VisibleObject> blackHoles = new ArrayList<>();
-    private final Channel channel = new Channel();
+    private final Channel channel = new Channel(this);
     private ServerConnection server = null;
     private ClientConnection client = null;
+    private WallPosition wormhole = WallPosition.NONE;
+
+    public WallPosition getWormhole() {
+        return wormhole;
+    }
+
+    public void setWormhole(WallPosition wormhole) {
+        this.wormhole = wormhole;
+    }
 
     private int listenPort = 3411;
     private int port = 3411;
@@ -142,14 +151,6 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
         }
     }
 
-    /**
-     * Open a wormhole to allow balls to pass through.
-     *
-     * @param position Wall to open wormhole on.
-     */
-    public void openWormhole(WallPosition position) {
-    }
-
     @Override
     public List<VisibleObject> getVisibleObjects() {
         return Stream.concat(this.blackHoles.stream(), this.balls.stream()).collect(Collectors.toList());
@@ -200,23 +201,13 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
         }
         ball.setColor(inside ? Color.BLUE : Color.RED);
         WallPosition wall = detectWall(ball);
-        switch (wall) {
-            case TOP:
-                if (this.channel.send(new Packet(ball))) {
-                    this.balls.remove(ball);
-                    ball.stop();
-                    ball = null;
-                    return false;
-                }
-                break;
-            case RIGHT:
-                break;
-            case BOTTOM:
-                break;
-            case LEFT:
-                break;
-            case NONE:
-                break;
+        if (this.wormhole == wall) {
+            if (this.wormhole != WallPosition.NONE && this.channel.send(new Packet(ball, wall))) {
+                this.balls.remove(ball);
+                ball.stop();
+                ball = null;
+                return false;
+            }
         }
         ball.bounce(wall);
         return move;
@@ -281,5 +272,28 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(BallTask::new);
+    }
+
+    @Override
+    public void didReceiveBall(Ball ball, WallPosition originalPosition) {
+        switch (originalPosition) {
+            case TOP:
+                ball.point.y = this.viewer.getHeight() - ball.size.height;
+                break;
+            case BOTTOM:
+                ball.point.y = ball.size.height;
+                break;
+            case RIGHT:
+                ball.point.x = ball.size.width;
+                break;
+            case LEFT:
+                ball.point.x = this.viewer.getWidth() - ball.size.width;
+                break;
+            case NONE:
+                break;
+        }
+        this.balls.add(ball);
+        ball.delegate = this;
+        ball.start();
     }
 }

@@ -2,6 +2,7 @@ package com.snebot.fbmoll.communication.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.snebot.fbmoll.graphic.Ball;
+import com.snebot.fbmoll.graphic.WallPosition;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -15,6 +16,7 @@ public class Packet implements Serializable {
     public int deltaX = 1;
     public int deltaY = 1;
     public int delay = 20;
+    public WallPosition position = WallPosition.NONE;
 
     public String getGreeting() {
         return greeting;
@@ -52,7 +54,8 @@ public class Packet implements Serializable {
         this.greeting = greeting;
     }
 
-    public Packet(Ball ball) {
+    public Packet(Ball ball, WallPosition position) {
+        this.position = position;
         setBall(ball);
     }
 }
