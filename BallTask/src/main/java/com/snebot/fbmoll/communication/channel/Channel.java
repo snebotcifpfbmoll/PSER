@@ -11,7 +11,10 @@ import java.net.Socket;
 
 public class Channel extends ThreadedObject {
     private static final String BALL_TASK_GREETING = "BallTask";
+    private static final String ACK_HEADER = "ACK";
+    private static final String YES_HEADER = "YES";
     private static final Logger log = LoggerFactory.getLogger(Channel.class);
+    private ChannelHealth health = new ChannelHealth(this);
     private Socket socket = null;
     private ChannelDelegate delegate = null;
 
@@ -33,6 +36,7 @@ public class Channel extends ThreadedObject {
 
     public synchronized void removeSocket() {
         this.socket = null;
+        log.info("removed socket");
     }
 
     public boolean send(Packet packet) {
@@ -58,13 +62,19 @@ public class Channel extends ThreadedObject {
                     if (reader == null)
                         reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
                     String line = reader.readLine();
-                    if (line != null) log.info("received: " + line);
-                    Packet packet = BallTaskHelper.unmarshallJSON(line, Packet.class);
-                    if (packet != null) {
-                        if (BALL_TASK_GREETING.equals(packet.getGreeting())) {
-                            log.info("received greeting msg");
-                        } else {
-                            if (this.delegate != null) this.delegate.didReceiveBall(packet.getBall(), packet.position);
+                    if (line != null) {
+                        Packet packet = BallTaskHelper.unmarshallJSON(line, Packet.class);
+                        if (packet != null) {
+                            if (BALL_TASK_GREETING.equals(packet.getHeader())) {
+                                log.info("received greeting msg");
+                                this.health.start();
+                            } else if (ACK_HEADER.equals(packet.getHeader())) {
+                                send(new Packet(YES_HEADER));
+                            } else if (YES_HEADER.equals(packet.getHeader())) {
+                                this.health.setConnected(true);
+                            } else {
+                                if (this.delegate != null) this.delegate.didReceiveBall(packet.getBall(), packet.position);
+                            }
                         }
                     }
                 }

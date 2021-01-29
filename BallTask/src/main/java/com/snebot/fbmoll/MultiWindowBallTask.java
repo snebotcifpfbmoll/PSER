@@ -9,14 +9,14 @@ public class MultiWindowBallTask {
             @Override
             public void run() {
                 BallTask ballTask = new BallTask(3411, "127.0.0.1", 3412);
-                ballTask.setWormhole(WallPosition.RIGHT);
+                ballTask.setWormhole(WallPosition.TOP);
             }
         };
         ThreadedObject b2 = new ThreadedObject() {
             @Override
             public void run() {
                 BallTask ballTask = new BallTask(3412, "127.0.0.1", 3411);
-                ballTask.setWormhole(WallPosition.LEFT);
+                ballTask.setWormhole(WallPosition.BOTTOM);
             }
         };
 

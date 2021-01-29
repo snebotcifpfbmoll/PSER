@@ -53,7 +53,7 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     }
 
     private int listenPort = 3411;
-    private int port = 3411;
+    private int port = 3412;
     private String ip = "127.0.0.1";
 
     public BallTask() {
@@ -188,6 +188,13 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
         return touch;
     }
 
+    private void removeFromBlackHoles(Ball ball) {
+        for (int i = 0; i < this.blackHoles.size(); i++) {
+            BlackHole blackHole = (BlackHole) this.blackHoles.get(i);
+            blackHole.remove(ball);
+        }
+    }
+
     @Override
     public boolean canMove(Ball ball) {
         boolean move = false;
@@ -204,6 +211,7 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
         if (this.wormhole == wall) {
             if (this.wormhole != WallPosition.NONE && this.channel.send(new Packet(ball, wall))) {
                 this.balls.remove(ball);
+                removeFromBlackHoles(ball);
                 ball.stop();
                 ball = null;
                 return false;

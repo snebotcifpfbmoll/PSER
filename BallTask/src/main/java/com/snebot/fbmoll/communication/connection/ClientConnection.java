@@ -65,7 +65,7 @@ public class ClientConnection extends ThreadedObject {
                         socket = null;
                     } else {
                         Packet packet = new Packet();
-                        packet.setGreeting("BallTask");
+                        packet.setHeader("BallTask");
                         this.channel.send(packet);
                     }
                 }

@@ -8,7 +8,7 @@ import java.awt.*;
 import java.io.Serializable;
 
 public class Packet implements Serializable {
-    private String greeting;
+    private String header;
     public int x = 0;
     public int y = 0;
     public int width = 40;
@@ -18,12 +18,12 @@ public class Packet implements Serializable {
     public int delay = 20;
     public WallPosition position = WallPosition.NONE;
 
-    public String getGreeting() {
-        return greeting;
+    public String getHeader() {
+        return header;
     }
 
-    public void setGreeting(String greeting) {
-        this.greeting = greeting;
+    public void setHeader(String header) {
+        this.header = header;
     }
 
     public void setBall(Ball ball) {
@@ -50,8 +50,8 @@ public class Packet implements Serializable {
     public Packet() {
     }
 
-    public Packet(String greeting) {
-        this.greeting = greeting;
+    public Packet(String header) {
+        this.header = header;
     }
 
     public Packet(Ball ball, WallPosition position) {
