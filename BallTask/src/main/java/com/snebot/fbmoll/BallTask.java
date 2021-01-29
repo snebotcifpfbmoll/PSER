@@ -19,8 +19,8 @@ import java.util.stream.Stream;
 public class BallTask extends JFrame implements BallDelegate, ControlPanelDelegate, ViewerDelegate {
     private static final int VIEW_WIDTH = 1200;
     private static final int VIEW_HEIGHT = 600;
-    private static final int MIN_BALL_COUNT = 15;
-    private static final int MAX_BALL_COUNT = 20;
+    private static final int MIN_BALL_COUNT = 1;
+    private static final int MAX_BALL_COUNT = 1;
     private static final int BALL_SPEED = 5;
     private static final int MIN_BALL_SPEED = -BALL_SPEED;
     private static final int MAX_BALL_SPEED = BALL_SPEED;
@@ -202,8 +202,12 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
         WallPosition wall = detectWall(ball);
         switch (wall) {
             case TOP:
-                //this.channel.send(new Packet(null, ball));
-                //this.balls.remove(ball);
+                if (this.channel.send(new Packet(ball))) {
+                    this.balls.remove(ball);
+                    ball.stop();
+                    ball = null;
+                    return false;
+                }
                 break;
             case RIGHT:
                 break;

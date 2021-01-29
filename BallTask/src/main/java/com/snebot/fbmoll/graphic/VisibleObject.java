@@ -9,8 +9,8 @@ public abstract class VisibleObject extends ThreadedObject {
     public Dimension size = new Dimension(40, 40);
     public int deltaX = 1;
     public int deltaY = 1;
-    protected int delay = 20;
-    protected Color color = Color.RED;
+    public int delay = 20;
+    public Color color = Color.RED;
 
     public int getDelay() {
         return delay;

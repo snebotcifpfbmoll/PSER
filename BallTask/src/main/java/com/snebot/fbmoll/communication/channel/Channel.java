@@ -33,15 +33,17 @@ public class Channel extends ThreadedObject {
         this.socket = null;
     }
 
-    public void send(Packet packet) {
-        if (this.socket == null) return;
+    public boolean send(Packet packet) {
+        if (this.socket == null) return false;
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
             String content = BallTaskHelper.marshallJSON(packet);
             writer.write(content + "\n");
             writer.flush();
+            return true;
         } catch (Exception e) {
             log.error("failed to send data: ", e);
+            return false;
         }
     }
 
@@ -56,10 +58,12 @@ public class Channel extends ThreadedObject {
                     String line = reader.readLine();
                     if (line != null) log.info("received: " + line);
                     Packet packet = BallTaskHelper.unmarshallJSON(line, Packet.class);
-                    if (packet != null && BALL_TASK_GREETING.equals(packet.getGreeting())) {
-                        log.info("received greeting msg");
-                    } else {
-                        log.info("no greeting");
+                    if (packet != null) {
+                        if (BALL_TASK_GREETING.equals(packet.getGreeting())) {
+                            log.info("received greeting msg");
+                        } else {
+                            System.out.println(packet.getBall());
+                        }
                     }
                 }
             } catch (Exception e) {
