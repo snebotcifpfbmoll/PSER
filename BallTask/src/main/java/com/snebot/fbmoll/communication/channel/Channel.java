@@ -23,7 +23,6 @@ public class Channel extends ThreadedObject {
     public synchronized boolean assignSocket(Socket socket) {
         if (this.socket != null) return false;
         this.socket = socket;
-        log.info("assigned socket");
         return true;
     }
 

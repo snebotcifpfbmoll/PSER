@@ -11,12 +11,28 @@ import java.net.Socket;
 
 public class ClientConnection extends ThreadedObject {
     private static final Logger log = LoggerFactory.getLogger(ClientConnection.class);
-    private static final String CONN_IP = "127.0.0.1";
-    private static final int CONN_PORT = 3411;
     private static final int MIN_TIMEOUT = 100;
     private static final int MAX_TIMEOUT = 400;
+    private String ip = "127.0.0.1";
+    private int port = 3411;
     private Channel channel = null;
     public int connection_delay = BallTaskHelper.random(MIN_TIMEOUT, MAX_TIMEOUT);
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 
     public Channel getChannel() {
         return channel;
@@ -38,9 +54,9 @@ public class ClientConnection extends ThreadedObject {
                 Thread.sleep(this.connection_delay);
                 if (this.channel.isOk()) continue;
                 try {
-                    socket = new Socket(CONN_IP, CONN_PORT);
+                    socket = new Socket(ip, port);
                 } catch (ConnectException e) {
-                    log.error("failed to connect to server", e);
+                    //log.error("failed to connect to server", e);
                 }
                 while (socket != null) {
                     if (!this.channel.assignSocket(socket)) {

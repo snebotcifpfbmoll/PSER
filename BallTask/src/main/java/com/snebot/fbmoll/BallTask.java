@@ -1,5 +1,8 @@
 package com.snebot.fbmoll;
 
+import com.snebot.fbmoll.communication.channel.Channel;
+import com.snebot.fbmoll.communication.connection.ClientConnection;
+import com.snebot.fbmoll.communication.connection.ServerConnection;
 import com.snebot.fbmoll.data.Statistics;
 import com.snebot.fbmoll.graphic.*;
 import com.snebot.fbmoll.helper.BallTaskHelper;
@@ -23,6 +26,7 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     private static final int BLACK_HOLE_COUNT = 2;
     private static final int[][] BLACK_HOLE_COORDS = new int[BLACK_HOLE_COUNT][2];
 
+
     static {
         BLACK_HOLE_COORDS[0][0] = 100;
         BLACK_HOLE_COORDS[0][1] = 0;
@@ -34,8 +38,33 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     private final ControlPanel controlPanel = new ControlPanel(150, VIEW_HEIGHT);
     private final List<VisibleObject> balls = new ArrayList<>();
     private final List<VisibleObject> blackHoles = new ArrayList<>();
+    private final Channel channel = new Channel();
+    private ServerConnection server = null;
+    private ClientConnection client = null;
+
+    private int listenPort = 3411;
+    private int port = 3411;
+    private String ip = "127.0.0.1";
 
     public BallTask() {
+        setup();
+    }
+
+    public BallTask(int listenPort, String ip, int port) {
+        this.listenPort = listenPort;
+        this.port = port;
+        this.ip = ip;
+        setup();
+    }
+
+    private void setup() {
+        this.server = new ServerConnection(this.channel);
+        this.client = new ClientConnection(this.channel);
+        this.server.setPort(this.listenPort);
+        this.client.setIp(this.ip);
+        this.client.setPort(this.port);
+        this.server.start();
+        this.client.start();
         setupUI();
         this.viewer.start();
     }
@@ -110,6 +139,14 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
             ball.deltaY = nonZeroDelta(MIN_BALL_SPEED, MAX_BALL_SPEED);
             list.add(ball);
         }
+    }
+
+    /**
+     * Open a wormhole to allow balls to pass through.
+     *
+     * @param position Wall to open wormhole on.
+     */
+    public void openWormhole(WallPosition position) {
     }
 
     @Override

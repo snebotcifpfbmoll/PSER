@@ -11,8 +11,16 @@ import java.net.Socket;
 
 public class ServerConnection extends ThreadedObject {
     private static final Logger log = LoggerFactory.getLogger(ServerConnection.class);
-    private static final int PORT = 3411;
+    private int port = 3411;
     private Channel channel = null;
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 
     public Channel getChannel() {
         return channel;
@@ -30,8 +38,8 @@ public class ServerConnection extends ThreadedObject {
     public void run() {
         ServerSocket serverSocket = null;
         try {
-            serverSocket = new ServerSocket(PORT);
-            log.info("Listening on port: " + PORT);
+            serverSocket = new ServerSocket(port);
+            log.info("Listening on port: " + port);
             while (this.run) {
                 Socket clientSocket = serverSocket.accept();
                 String clientAddress = clientSocket.getInetAddress().getHostAddress();

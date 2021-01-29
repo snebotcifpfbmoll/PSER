@@ -12,6 +12,6 @@ public class ServerClientTest {
         ClientConnection client = new ClientConnection(new Channel());
         server.start();
         client.start();
-        System.out.println(client.join(10000));
+        System.out.println(client.join());
     }
 }
