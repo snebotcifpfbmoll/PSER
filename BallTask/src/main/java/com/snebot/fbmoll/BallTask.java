@@ -3,6 +3,7 @@ package com.snebot.fbmoll;
 import com.snebot.fbmoll.communication.channel.Channel;
 import com.snebot.fbmoll.communication.connection.ClientConnection;
 import com.snebot.fbmoll.communication.connection.ServerConnection;
+import com.snebot.fbmoll.communication.data.Packet;
 import com.snebot.fbmoll.data.Statistics;
 import com.snebot.fbmoll.graphic.*;
 import com.snebot.fbmoll.helper.BallTaskHelper;
@@ -198,7 +199,22 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
             if (!move && inside) blackHole.remove(ball);
         }
         ball.setColor(inside ? Color.BLUE : Color.RED);
-        ball.bounce(detectWall(ball));
+        WallPosition wall = detectWall(ball);
+        switch (wall) {
+            case TOP:
+                //this.channel.send(new Packet(null, ball));
+                //this.balls.remove(ball);
+                break;
+            case RIGHT:
+                break;
+            case BOTTOM:
+                break;
+            case LEFT:
+                break;
+            case NONE:
+                break;
+        }
+        ball.bounce(wall);
         return move;
     }
 

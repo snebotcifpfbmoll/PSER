@@ -1,5 +1,6 @@
 package com.snebot.fbmoll.communication.channel;
 
+import com.snebot.fbmoll.communication.data.Packet;
 import com.snebot.fbmoll.helper.BallTaskHelper;
 import com.snebot.fbmoll.thread.ThreadedObject;
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import java.io.*;
 import java.net.Socket;
 
 public class Channel extends ThreadedObject {
+    private static final String BALL_TASK_GREETING = "BallTask";
     private static final Logger log = LoggerFactory.getLogger(Channel.class);
     private Socket socket = null;
 
@@ -21,6 +23,7 @@ public class Channel extends ThreadedObject {
     }
 
     public synchronized boolean assignSocket(Socket socket) {
+        if (this.socket != null && this.socket.equals(socket)) return true;
         if (this.socket != null) return false;
         this.socket = socket;
         return true;
@@ -30,13 +33,13 @@ public class Channel extends ThreadedObject {
         this.socket = null;
     }
 
-    public void send(String str) {
+    public void send(Packet packet) {
         if (this.socket == null) return;
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
-            writer.write(str);
+            String content = BallTaskHelper.marshallJSON(packet);
+            writer.write(content + "\n");
             writer.flush();
-            log.info("send: " + str);
         } catch (Exception e) {
             log.error("failed to send data: ", e);
         }
@@ -52,6 +55,12 @@ public class Channel extends ThreadedObject {
                         reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
                     String line = reader.readLine();
                     if (line != null) log.info("received: " + line);
+                    Packet packet = BallTaskHelper.unmarshallJSON(line, Packet.class);
+                    if (packet != null && BALL_TASK_GREETING.equals(packet.getGreeting())) {
+                        log.info("received greeting msg");
+                    } else {
+                        log.info("no greeting");
+                    }
                 }
             } catch (Exception e) {
                 log.error("Channel thread failed: ", e);

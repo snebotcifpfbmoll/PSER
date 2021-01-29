@@ -1,6 +1,7 @@
 package com.snebot.fbmoll.communication.connection;
 
 import com.snebot.fbmoll.communication.channel.Channel;
+import com.snebot.fbmoll.communication.data.Packet;
 import com.snebot.fbmoll.helper.BallTaskHelper;
 import com.snebot.fbmoll.thread.ThreadedObject;
 import org.slf4j.Logger;
@@ -12,7 +13,7 @@ import java.net.Socket;
 public class ClientConnection extends ThreadedObject {
     private static final Logger log = LoggerFactory.getLogger(ClientConnection.class);
     private static final int MIN_TIMEOUT = 100;
-    private static final int MAX_TIMEOUT = 400;
+    private static final int MAX_TIMEOUT = 600;
     private String ip = "127.0.0.1";
     private int port = 3411;
     private Channel channel = null;
@@ -58,14 +59,14 @@ public class ClientConnection extends ThreadedObject {
                 } catch (ConnectException e) {
                     //log.error("failed to connect to server", e);
                 }
-                while (socket != null) {
+                if (socket != null) {
                     if (!this.channel.assignSocket(socket)) {
                         BallTaskHelper.close(socket);
                         socket = null;
                     } else {
-                        this.channel.send("Hello from client.\n");
-                        Thread.sleep(1000);
-                        this.channel.send("Hello again, from client.\n");
+                        Packet packet = new Packet();
+                        packet.setGreeting("BallTask");
+                        this.channel.send(packet);
                     }
                 }
             }

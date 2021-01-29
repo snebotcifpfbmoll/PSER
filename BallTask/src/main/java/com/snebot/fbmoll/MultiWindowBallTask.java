@@ -7,13 +7,13 @@ public class MultiWindowBallTask {
         ThreadedObject b1 = new ThreadedObject() {
             @Override
             public void run() {
-                BallTask ballTask = new BallTask(4311, "127.0.0.1", 3412);
+                BallTask ballTask = new BallTask(3411, "127.0.0.1", 3412);
             }
         };
         ThreadedObject b2 = new ThreadedObject() {
             @Override
             public void run() {
-                BallTask ballTask = new BallTask(4312, "127.0.0.1", 3411);
+                BallTask ballTask = new BallTask(3412, "127.0.0.1", 3411);
             }
         };
 
