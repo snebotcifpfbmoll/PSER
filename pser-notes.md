@@ -38,3 +38,6 @@ Networks are interconnected with a device called router. This device is responsi
 
 # Switch
 Is a networking hardware that connects devices on a computer network by forwading data between source and destination.
+
+# Threads
+[Guarded blocks](https://docs.oracle.com/javase/tutorial/essential/concurrency/guardmeth.html)
