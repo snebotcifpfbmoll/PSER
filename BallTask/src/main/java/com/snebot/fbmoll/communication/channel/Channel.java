@@ -17,6 +17,7 @@ public class Channel extends ThreadedObject {
     private ChannelHealth health = new ChannelHealth(this);
     private Socket socket = null;
     private ChannelDelegate delegate = null;
+    private boolean check_connection = false;
 
     public Channel(ChannelDelegate delegate) {
         this.delegate = delegate;
@@ -53,6 +54,19 @@ public class Channel extends ThreadedObject {
         }
     }
 
+    public boolean checkConnection(int timeout) {
+        try {
+            send(new Packet(ACK_HEADER));
+            this.check_connection = false;
+            Thread.sleep(timeout);
+            log.info("conn: " + this.check_connection);
+            return this.check_connection;
+        } catch (Exception e) {
+            log.error("failed to check connection", e);
+        }
+        return false;
+    }
+
     @Override
     public void run() {
         while (this.run) {
@@ -70,8 +84,10 @@ public class Channel extends ThreadedObject {
                                 this.health.start();
                             } else if (ACK_HEADER.equals(packet.getHeader())) {
                                 send(new Packet(YES_HEADER));
+                                log.info("send YES");
                             } else if (YES_HEADER.equals(packet.getHeader())) {
-                                this.health.setConnected(true);
+                                log.info("received YES");
+                                this.check_connection = true;
                             } else {
                                 if (this.delegate != null) this.delegate.didReceiveBall(packet.getBall(), packet.position);
                             }

@@ -20,8 +20,8 @@ import java.util.stream.Stream;
 public class BallTask extends JFrame implements BallDelegate, ControlPanelDelegate, ViewerDelegate, ChannelDelegate {
     private static final int VIEW_WIDTH = 1200;
     private static final int VIEW_HEIGHT = 600;
-    private static final int MIN_BALL_COUNT = 1;
-    private static final int MAX_BALL_COUNT = 1;
+    private static final int MIN_BALL_COUNT = 15;
+    private static final int MAX_BALL_COUNT = 20;
     private static final int BALL_SPEED = 5;
     private static final int MIN_BALL_SPEED = -BALL_SPEED;
     private static final int MAX_BALL_SPEED = BALL_SPEED;
@@ -174,18 +174,6 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
             }
         }
         return stats;
-    }
-
-    public boolean willTouchBlackHole(Ball ball) {
-        boolean touch = false;
-        for (int i = 0; i < this.blackHoles.size() && !touch; i++) {
-            BlackHole blackHole = (BlackHole) this.blackHoles.get(i);
-            touch = ball.intersects(blackHole);
-            boolean inside = blackHole.checkBall(ball);
-            if (touch) blackHole.put(ball);
-            if (!touch && inside) blackHole.remove(ball);
-        }
-        return touch;
     }
 
     private void removeFromBlackHoles(Ball ball) {
