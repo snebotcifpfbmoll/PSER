@@ -8,6 +8,10 @@ import java.awt.*;
 import java.io.Serializable;
 
 public class Packet implements Serializable {
+    public static final String BALL_TASK_GREETING = "BallTask";
+    public static final String ACK_HEADER = "ACK";
+    public static final String YES_HEADER = "YES";
+
     private String header;
     public int x = 0;
     public int y = 0;
@@ -57,5 +61,13 @@ public class Packet implements Serializable {
     public Packet(Ball ball, WallPosition position) {
         this.position = position;
         setBall(ball);
+    }
+
+    public static Packet headerACK() {
+        return new Packet(ACK_HEADER);
+    }
+
+    public static Packet headerYES() {
+        return new Packet(YES_HEADER);
     }
 }

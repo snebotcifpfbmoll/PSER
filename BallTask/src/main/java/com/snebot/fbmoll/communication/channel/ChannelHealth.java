@@ -1,5 +1,6 @@
 package com.snebot.fbmoll.communication.channel;
 
+import com.snebot.fbmoll.communication.data.Packet;
 import com.snebot.fbmoll.thread.ThreadedObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +8,17 @@ import org.slf4j.LoggerFactory;
 public class ChannelHealth extends ThreadedObject {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private Channel channel;
-    public int delay = 1000;
+    private boolean ack = false;
+    public int delay = 600;
+    public int ack_retries = 5;
+
+    public synchronized void setACK(boolean ack) {
+        this.ack = ack;
+    }
+
+    public synchronized boolean getACK() {
+        return this.ack;
+    }
 
     public Channel getChannel() {
         return channel;
@@ -26,9 +37,15 @@ public class ChannelHealth extends ThreadedObject {
     public void run() {
         try {
             while (this.run && this.channel != null) {
-                Thread.sleep(delay);
-                if (!this.channel.isOk()) continue;
-                if (!this.channel.checkConnection(this.delay)) this.channel.removeSocket();
+                Thread.sleep(this.delay);
+                if (this.channel.isOk()) {
+                    setACK(false);
+                    this.channel.send(Packet.headerACK());
+                    for (int i = 0; i < this.ack_retries && !this.ack; i++)
+                        Thread.sleep(this.delay);
+                    if (!this.ack)
+                        this.channel.removeSocket();
+                }
             }
         } catch (Exception e) {
             log.error("ChannelHealth thread crashed");

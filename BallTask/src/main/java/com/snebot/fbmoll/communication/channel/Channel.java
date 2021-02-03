@@ -13,14 +13,10 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 public class Channel extends ThreadedObject {
-    private static final String BALL_TASK_GREETING = "BallTask";
-    private static final String ACK_HEADER = "ACK";
-    private static final String YES_HEADER = "YES";
     private static final Logger log = LoggerFactory.getLogger(Channel.class);
     private ChannelHealth health = new ChannelHealth(this);
     protected Socket socket = null;
     private ChannelDelegate delegate = null;
-    private boolean check_connection = false;
 
     public Channel(ChannelDelegate delegate) {
         this.delegate = delegate;
@@ -58,19 +54,6 @@ public class Channel extends ThreadedObject {
         }
     }
 
-    public boolean checkConnection(int timeout) {
-        try {
-            send(new Packet(ACK_HEADER));
-            this.check_connection = false;
-            Thread.sleep(timeout);
-            log.info("conn: " + this.check_connection);
-            return this.check_connection;
-        } catch (Exception e) {
-            log.error("failed to check connection", e);
-        }
-        return false;
-    }
-
     @Override
     public void run() {
         while (this.run) {
@@ -83,14 +66,12 @@ public class Channel extends ThreadedObject {
                     if (line != null) {
                         Packet packet = BallTaskHelper.unmarshallJSON(line, Packet.class);
                         if (packet != null) {
-                            if (BALL_TASK_GREETING.equals(packet.getHeader())) {
+                            if (Packet.BALL_TASK_GREETING.equals(packet.getHeader())) {
                                 log.info("received greeting msg");
-                            } else if (ACK_HEADER.equals(packet.getHeader())) {
-                                send(new Packet(YES_HEADER));
-                                log.info("send YES");
-                            } else if (YES_HEADER.equals(packet.getHeader())) {
-                                log.info("received YES");
-                                this.check_connection = true;
+                            } else if (Packet.ACK_HEADER.equals(packet.getHeader())) {
+                                send(Packet.headerYES());
+                            } else if (Packet.YES_HEADER.equals(packet.getHeader())) {
+                                this.health.setACK(true);
                             } else {
                                 if (this.delegate != null)
                                     this.delegate.didReceiveBall(packet.getBall(), packet.position);

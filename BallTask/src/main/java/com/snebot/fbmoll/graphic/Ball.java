@@ -32,8 +32,6 @@ public class Ball extends VisibleObject {
         while (this.run && this.delegate != null) {
             try {
                 if (!this.paused) {
-                    //this.color = this.delegate.willTouchBlackHole(this) ? Color.BLUE : Color.red;
-                    //this.delegate.willBounce(this);
                     this.delegate.canMove(this);
                     this.step();
                 }
