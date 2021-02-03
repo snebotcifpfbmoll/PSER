@@ -16,7 +16,7 @@ public class ChannelHealth extends ThreadedObject {
         this.ack = ack;
     }
 
-    public synchronized boolean getACK() {
+    public boolean getACK() {
         return this.ack;
     }
 
@@ -38,6 +38,7 @@ public class ChannelHealth extends ThreadedObject {
         try {
             while (this.run && this.channel != null) {
                 Thread.sleep(this.delay);
+                log.info("isOK: " + this.channel.isOk());
                 if (this.channel.isOk()) {
                     setACK(false);
                     this.channel.send(Packet.headerACK());
