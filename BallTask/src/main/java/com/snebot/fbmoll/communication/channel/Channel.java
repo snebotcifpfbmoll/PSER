@@ -6,7 +6,10 @@ import com.snebot.fbmoll.thread.ThreadedObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 public class Channel extends ThreadedObject {
@@ -15,7 +18,7 @@ public class Channel extends ThreadedObject {
     private static final String YES_HEADER = "YES";
     private static final Logger log = LoggerFactory.getLogger(Channel.class);
     private ChannelHealth health = new ChannelHealth(this);
-    private Socket socket = null;
+    protected Socket socket = null;
     private ChannelDelegate delegate = null;
     private boolean check_connection = false;
 
@@ -36,12 +39,13 @@ public class Channel extends ThreadedObject {
     }
 
     public synchronized void removeSocket() {
+        BallTaskHelper.close(this.socket);
         this.socket = null;
         log.info("removed socket");
     }
 
     public boolean send(Packet packet) {
-        if (this.socket == null) return false;
+        if (this.socket == null || this.socket.isClosed()) return false;
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
             String content = BallTaskHelper.marshallJSON(packet);
@@ -72,7 +76,7 @@ public class Channel extends ThreadedObject {
         while (this.run) {
             BufferedReader reader = null;
             try {
-                while (this.socket != null && !this.socket.isClosed()) {
+                while (isOk() && !this.socket.isClosed()) {
                     if (reader == null)
                         reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
                     String line = reader.readLine();
@@ -81,7 +85,6 @@ public class Channel extends ThreadedObject {
                         if (packet != null) {
                             if (BALL_TASK_GREETING.equals(packet.getHeader())) {
                                 log.info("received greeting msg");
-                                this.health.start();
                             } else if (ACK_HEADER.equals(packet.getHeader())) {
                                 send(new Packet(YES_HEADER));
                                 log.info("send YES");
@@ -89,7 +92,8 @@ public class Channel extends ThreadedObject {
                                 log.info("received YES");
                                 this.check_connection = true;
                             } else {
-                                if (this.delegate != null) this.delegate.didReceiveBall(packet.getBall(), packet.position);
+                                if (this.delegate != null)
+                                    this.delegate.didReceiveBall(packet.getBall(), packet.position);
                             }
                         }
                     }

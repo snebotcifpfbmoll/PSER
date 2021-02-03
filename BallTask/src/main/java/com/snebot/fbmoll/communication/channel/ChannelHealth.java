@@ -19,6 +19,7 @@ public class ChannelHealth extends ThreadedObject {
 
     public ChannelHealth(Channel channel) {
         this.channel = channel;
+        this.start();
     }
 
     @Override

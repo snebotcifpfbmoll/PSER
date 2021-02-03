@@ -57,7 +57,6 @@ public class ClientConnection extends ThreadedObject {
                 try {
                     socket = new Socket(ip, port);
                 } catch (ConnectException e) {
-                    //log.error("failed to connect to server", e);
                 }
                 if (socket != null) {
                     if (!this.channel.assignSocket(socket)) {
