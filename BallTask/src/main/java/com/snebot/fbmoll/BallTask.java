@@ -25,6 +25,8 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
     private static final int BALL_SPEED = 5;
     private static final int MIN_BALL_SPEED = -BALL_SPEED;
     private static final int MAX_BALL_SPEED = BALL_SPEED;
+    private static final int MIN_BALL_SIZE = 40;
+    private static final int MAX_BALL_SIZE = 80;
     private static final int BLACK_HOLE_COUNT = 2;
     private static final int[][] BLACK_HOLE_COORDS = new int[BLACK_HOLE_COUNT][2];
 
@@ -147,6 +149,9 @@ public class BallTask extends JFrame implements BallDelegate, ControlPanelDelega
             ball.point.y = BallTaskHelper.random(0, this.viewer.getHeight() - ball.size.height);
             ball.deltaX = nonZeroDelta(MIN_BALL_SPEED, MAX_BALL_SPEED);
             ball.deltaY = nonZeroDelta(MIN_BALL_SPEED, MAX_BALL_SPEED);
+            int size = BallTaskHelper.random(MIN_BALL_SIZE, MAX_BALL_SIZE);
+            ball.size.width = size;
+            ball.size.height = size;
             list.add(ball);
         }
     }
