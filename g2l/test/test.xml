@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<xml>
+  <block id="test">
+    <text position="center" font="bold" fontsize="big">TEST</text>
+  </block>
+</xml>
